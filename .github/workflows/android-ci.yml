@@ -31,4 +31,4 @@ jobs:
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Build and run tests
-        run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest
+        run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:verifyPaparazziDebug

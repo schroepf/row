@@ -13,8 +13,14 @@ Android sample application using:
 ./gradlew :app:testDebugUnitTest
 ```
 
-## Run snapshot tests
+## Record snapshot references
 
 ```bash
-./gradlew :app:testDebugUnitTest --tests "com.schroepf.row.RowScreenSnapshotTest"
+./gradlew :app:recordPaparazziDebug
+```
+
+## Verify snapshot tests
+
+```bash
+./gradlew :app:verifyPaparazziDebug
 ```
