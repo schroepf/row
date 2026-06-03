@@ -1,20 +1,11 @@
-package com.schroepf.row
+package com.schroepf.row.api.auth
 
 import android.net.Uri
+import com.schroepf.row.BuildConfig
+import com.schroepf.row.api.ApiConstants
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
-
-private const val CONCEPT2_AUTHORIZATION_ENDPOINT = "https://log.concept2.com/oauth/authorize"
-const val CONCEPT2_TOKEN_ENDPOINT = "https://log.concept2.com/oauth/access_token"
-const val CONCEPT2_PROFILE_ENDPOINT = "https://log.concept2.com/api/users/me"
-private const val CONCEPT2_SCOPE = "user:read,results:read"
-
-data class Concept2AuthConfig(
-    val clientId: String,
-    val clientSecret: String,
-    val redirectUri: Uri
-)
 
 fun concept2AuthConfig(): Concept2AuthConfig = Concept2AuthConfig(
     clientId = BuildConfig.CONCEPT2_CLIENT_ID,
@@ -25,12 +16,10 @@ fun concept2AuthConfig(): Concept2AuthConfig = Concept2AuthConfig(
 fun buildAuthorizationRequest(config: Concept2AuthConfig): AuthorizationRequest =
     AuthorizationRequest.Builder(
         AuthorizationServiceConfiguration(
-            Uri.parse(CONCEPT2_AUTHORIZATION_ENDPOINT),
-            Uri.parse(CONCEPT2_TOKEN_ENDPOINT)
+            Uri.parse(ApiConstants.CONCEPT2_AUTHORIZATION_ENDPOINT),
+            Uri.parse(ApiConstants.CONCEPT2_TOKEN_ENDPOINT)
         ),
         config.clientId,
         ResponseTypeValues.CODE,
         config.redirectUri
-    ).setScope(CONCEPT2_SCOPE).build()
-
-fun concept2Scope(): String = CONCEPT2_SCOPE
+    ).setScope(ApiConstants.CONCEPT2_SCOPE).build()

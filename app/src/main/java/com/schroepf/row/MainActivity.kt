@@ -7,6 +7,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import com.schroepf.row.api.auth.buildAuthorizationRequest
+import com.schroepf.row.api.auth.concept2AuthConfig
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService

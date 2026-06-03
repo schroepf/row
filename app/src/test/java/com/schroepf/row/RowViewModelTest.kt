@@ -1,5 +1,8 @@
 package com.schroepf.row
 
+import com.schroepf.row.api.log.RowApi
+import com.schroepf.row.api.log.UserProfile
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -22,7 +25,7 @@ class RowViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val profile = RowProfile(
+    private val profile = UserProfile(
         username = "davidhart",
         fullName = "David Hart",
         email = "davidh@concept2.com",
@@ -33,7 +36,7 @@ class RowViewModelTest {
     fun `authorization code loads concept2 profile`() = runTest {
         val viewModel = RowViewModel(
             rowApi = object : RowApi {
-                override suspend fun fetchUserProfile(authorizationCode: String): RowProfile {
+                override suspend fun fetchUserProfile(authorizationCode: String): UserProfile {
                     delay(1)
                     assertEquals("auth-code", authorizationCode)
                     return profile
@@ -55,7 +58,7 @@ class RowViewModelTest {
     fun `authorization code failure exposes error`() = runTest {
         val viewModel = RowViewModel(
             rowApi = object : RowApi {
-                override suspend fun fetchUserProfile(authorizationCode: String): RowProfile {
+                override suspend fun fetchUserProfile(authorizationCode: String): UserProfile {
                     throw IllegalStateException("invalid_grant")
                 }
             }

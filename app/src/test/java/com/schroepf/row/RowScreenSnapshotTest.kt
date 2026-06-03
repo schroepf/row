@@ -1,5 +1,7 @@
 package com.schroepf.row
 
+import com.schroepf.row.api.log.UserProfile
+
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +42,7 @@ class RowScreenSnapshotTest {
             MaterialTheme {
                 RowScreen(
                     state = RowState(
-                        profile = RowProfile(
+                        profile = UserProfile(
                             username = "davidhart",
                             fullName = "David Hart",
                             email = "davidh@concept2.com",

@@ -32,7 +32,7 @@ jobs:
 
       - name: Build and run tests
         env:
-          CONCEPT2_CLIENT_ID: ${{ vars.CONCEPT2_CLIENT_ID }}
-          CONCEPT2_CLIENT_SECRET: ${{ vars.CONCEPT2_CLIENT_SECRET }}
-          CONCEPT2_REDIRECT_URI: ${{ vars.CONCEPT2_REDIRECT_URI }}
+          CONCEPT2_CLIENT_ID: ${{ secrets.CONCEPT2_CLIENT_ID }}
+          CONCEPT2_CLIENT_SECRET: ${{ secrets.CONCEPT2_CLIENT_SECRET }}
+          CONCEPT2_REDIRECT_URI: ${{ secrets.CONCEPT2_REDIRECT_URI }}
         run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:verifyPaparazziDebug

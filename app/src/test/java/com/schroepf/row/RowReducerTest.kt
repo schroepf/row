@@ -1,5 +1,7 @@
 package com.schroepf.row
 
+import com.schroepf.row.api.log.UserProfile
+
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -7,7 +9,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RowReducerTest {
-    private val profile = RowProfile(
+    private val profile = UserProfile(
         username = "davidhart",
         fullName = "David Hart",
         email = "davidh@concept2.com",
