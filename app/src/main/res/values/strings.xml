@@ -1,5 +1,13 @@
 <resources>
     <string name="app_name">row</string>
-    <string name="refresh">Refresh</string>
-    <string name="loading">Loading…</string>
+    <string name="login">Log in to Concept2</string>
+    <string name="login_again">Log in again</string>
+    <string name="loading">Loading your Concept2 profile…</string>
+    <string name="login_prompt">Log in to Concept2 Logbook to load your profile.</string>
+    <string name="login_failed_generic">Concept2 login failed.</string>
+    <string name="profile_title">Concept2 profile</string>
+    <string name="profile_username">Username: %1$s</string>
+    <string name="profile_name">Name: %1$s</string>
+    <string name="profile_email">Email: %1$s</string>
+    <string name="profile_country">Country: %1$s</string>
 </resources>

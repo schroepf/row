@@ -1,3 +1,6 @@
+import java.net.URI
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +8,32 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.paparazzi)
 }
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use(::load)
+    }
+}
+
+fun requiredConcept2Config(environmentName: String, localPropertyName: String): String {
+    val environmentValue = providers.environmentVariable(environmentName).orNull?.takeIf { it.isNotBlank() }
+    val localPropertyValue = localProperties.getProperty(localPropertyName)?.takeIf { it.isNotBlank() }
+    return environmentValue ?: localPropertyValue
+    ?: throw GradleException(
+        "Missing required Concept2 configuration. Set $environmentName or $localPropertyName in local.properties."
+    )
+}
+
+fun String.toBuildConfigString(): String = "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+val concept2ClientId = requiredConcept2Config("CONCEPT2_CLIENT_ID", "concept2.clientId")
+val concept2ClientSecret = requiredConcept2Config("CONCEPT2_CLIENT_SECRET", "concept2.clientSecret")
+val concept2RedirectUri = requiredConcept2Config("CONCEPT2_REDIRECT_URI", "concept2.redirectUri")
+
+val parsedRedirectUri = URI(concept2RedirectUri)
+val redirectScheme = parsedRedirectUri.scheme
+    ?: throw GradleException("CONCEPT2_REDIRECT_URI must include a URI scheme.")
 
 android {
     namespace = "com.schroepf.row"
@@ -18,6 +47,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "CONCEPT2_CLIENT_ID", concept2ClientId.toBuildConfigString())
+        buildConfigField("String", "CONCEPT2_CLIENT_SECRET", concept2ClientSecret.toBuildConfigString())
+        buildConfigField("String", "CONCEPT2_REDIRECT_URI", concept2RedirectUri.toBuildConfigString())
+        manifestPlaceholders["appAuthRedirectScheme"] = redirectScheme
     }
 
     buildTypes {
@@ -38,6 +71,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true
@@ -55,6 +89,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.google.material)
+    implementation(libs.appauth)
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(libs.ktor.client.core)

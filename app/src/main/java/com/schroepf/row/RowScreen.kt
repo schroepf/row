@@ -15,21 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun RowApp(viewModel: RowViewModel = viewModel(factory = RowViewModel.factory())) {
+fun RowApp(
+    viewModel: RowViewModel,
+    onLogin: () -> Unit
+) {
     val state by viewModel.state.collectAsState()
     RowScreen(
         state = state,
-        onRefresh = { viewModel.send(RowIntent.Refresh) }
+        onLogin = onLogin
     )
 }
 
 @Composable
 fun RowScreen(
     state: RowState,
-    onRefresh: () -> Unit,
+    onLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -39,24 +41,79 @@ fun RowScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val text = when {
-            state.isLoading -> stringResource(id = R.string.loading)
-            state.error != null -> state.error
-            state.message.isNotBlank() -> state.message
-            else -> ""
-        }
+        when {
+            state.isLoading -> {
+                Text(
+                    text = stringResource(id = R.string.loading),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
+            }
 
-        Text(
-            text = text,
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center
-        )
+            state.error != null -> {
+                Text(
+                    text = state.error,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            state.profile != null -> {
+                Text(
+                    text = stringResource(id = R.string.profile_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    modifier = Modifier.padding(top = 16.dp),
+                    text = stringResource(id = R.string.profile_username, state.profile.username),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    modifier = Modifier.padding(top = 8.dp),
+                    text = stringResource(id = R.string.profile_name, state.profile.fullName),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+                state.profile.email?.let { email ->
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = stringResource(id = R.string.profile_email, email),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                state.profile.country?.let { country ->
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = stringResource(id = R.string.profile_country, country),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            else -> {
+                Text(
+                    text = stringResource(id = R.string.login_prompt),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
 
         Button(
             modifier = Modifier.padding(top = 16.dp),
-            onClick = onRefresh
+            onClick = onLogin,
+            enabled = !state.isLoading
         ) {
-            Text(text = stringResource(id = R.string.refresh))
+            Text(
+                text = stringResource(
+                    id = if (state.profile == null) R.string.login else R.string.login_again
+                )
+            )
         }
     }
 }

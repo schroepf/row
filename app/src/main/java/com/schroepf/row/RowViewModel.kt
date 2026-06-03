@@ -20,23 +20,22 @@ class RowViewModel(
     private val _state = MutableStateFlow(RowState())
     val state: StateFlow<RowState> = _state.asStateFlow()
 
-    init {
-        send(RowIntent.Refresh)
-    }
-
     fun send(intent: RowIntent) {
         when (intent) {
-            RowIntent.Refresh -> refresh()
+            is RowIntent.AuthorizationCodeReceived -> loadProfile(intent.code)
+            is RowIntent.LoginFailed -> {
+                _state.update { RowReducer.reduce(it, RowResult.Failure(intent.error)) }
+            }
         }
     }
 
-    private fun refresh() {
+    private fun loadProfile(authorizationCode: String) {
         _state.update { RowReducer.reduce(it, RowResult.Loading) }
         viewModelScope.launch {
             runCatching {
-                rowApi.fetchWelcomeMessage()
-            }.onSuccess { message ->
-                _state.update { RowReducer.reduce(it, RowResult.Success(message)) }
+                rowApi.fetchUserProfile(authorizationCode)
+            }.onSuccess { profile ->
+                _state.update { RowReducer.reduce(it, RowResult.Success(profile)) }
             }.onFailure { throwable ->
                 _state.update {
                     RowReducer.reduce(
@@ -58,7 +57,7 @@ class RowViewModel(
                         }
                     }
                     @Suppress("UNCHECKED_CAST")
-                    return RowViewModel(KtorRowApi(client)) as T
+                    return RowViewModel(KtorRowApi(client, concept2AuthConfig())) as T
                 }
             }
     }
