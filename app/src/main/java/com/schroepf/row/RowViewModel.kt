@@ -25,18 +25,18 @@ class RowViewModel(
 
     fun send(intent: RowIntent) {
         when (intent) {
-            is RowIntent.AuthorizationCodeReceived -> loadProfile(intent.code)
+            is RowIntent.AuthorizationCodeReceived -> loadProfile(intent.code, intent.codeVerifier)
             is RowIntent.LoginFailed -> {
                 _state.update { RowReducer.reduce(it, RowResult.Failure(intent.error)) }
             }
         }
     }
 
-    private fun loadProfile(authorizationCode: String) {
+    private fun loadProfile(authorizationCode: String, codeVerifier: String?) {
         _state.update { RowReducer.reduce(it, RowResult.Loading) }
         viewModelScope.launch {
             runCatching {
-                rowApi.fetchUserProfile(authorizationCode)
+                rowApi.fetchUserProfile(authorizationCode, codeVerifier)
             }.onSuccess { profile ->
                 _state.update { RowReducer.reduce(it, RowResult.Success(profile)) }
             }.onFailure { throwable ->

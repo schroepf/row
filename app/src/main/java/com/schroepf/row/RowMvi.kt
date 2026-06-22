@@ -3,7 +3,7 @@ package com.schroepf.row
 import com.schroepf.row.api.log.UserProfile
 
 sealed interface RowIntent {
-    data class AuthorizationCodeReceived(val code: String) : RowIntent
+    data class AuthorizationCodeReceived(val code: String, val codeVerifier: String?) : RowIntent
     data class LoginFailed(val error: String) : RowIntent
 }
 

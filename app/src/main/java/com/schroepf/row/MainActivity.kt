@@ -24,7 +24,12 @@ class MainActivity : ComponentActivity() {
 
             when {
                 response?.authorizationCode != null -> {
-                    viewModel.send(RowIntent.AuthorizationCodeReceived(response.authorizationCode!!))
+                    viewModel.send(
+                        RowIntent.AuthorizationCodeReceived(
+                            code = response.authorizationCode!!,
+                            codeVerifier = response.request.codeVerifier
+                        )
+                    )
                 }
 
                 exception != null -> {

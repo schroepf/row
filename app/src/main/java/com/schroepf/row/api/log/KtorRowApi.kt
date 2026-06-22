@@ -16,7 +16,7 @@ class KtorRowApi(
     private val client: HttpClient,
     private val authConfig: Concept2AuthConfig
 ) : RowApi {
-    override suspend fun fetchUserProfile(authorizationCode: String): UserProfile {
+    override suspend fun fetchUserProfile(authorizationCode: String, codeVerifier: String?): UserProfile {
         val tokenResponse = client.submitForm(
             url = ApiConstants.CONCEPT2_TOKEN_ENDPOINT,
             formParameters = Parameters.build {
@@ -26,6 +26,7 @@ class KtorRowApi(
                 append("grant_type", "authorization_code")
                 append("redirect_uri", authConfig.redirectUri.toString())
                 append("scope", ApiConstants.CONCEPT2_SCOPE)
+                if (codeVerifier != null) append("code_verifier", codeVerifier)
             }
         ).requireSuccess<Concept2TokenResponse>("Concept2 token exchange")
 

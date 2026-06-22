@@ -36,7 +36,7 @@ class RowViewModelTest {
     fun `authorization code loads concept2 profile`() = runTest {
         val viewModel = RowViewModel(
             rowApi = object : RowApi {
-                override suspend fun fetchUserProfile(authorizationCode: String): UserProfile {
+                override suspend fun fetchUserProfile(authorizationCode: String, codeVerifier: String?): UserProfile {
                     delay(1)
                     assertEquals("auth-code", authorizationCode)
                     return profile
@@ -44,7 +44,7 @@ class RowViewModelTest {
             }
         )
 
-        viewModel.send(RowIntent.AuthorizationCodeReceived("auth-code"))
+        viewModel.send(RowIntent.AuthorizationCodeReceived("auth-code", codeVerifier = null))
 
         assertTrue(viewModel.state.value.isLoading)
         advanceUntilIdle()
@@ -58,13 +58,13 @@ class RowViewModelTest {
     fun `authorization code failure exposes error`() = runTest {
         val viewModel = RowViewModel(
             rowApi = object : RowApi {
-                override suspend fun fetchUserProfile(authorizationCode: String): UserProfile {
+                override suspend fun fetchUserProfile(authorizationCode: String, codeVerifier: String?): UserProfile {
                     throw IllegalStateException("invalid_grant")
                 }
             }
         )
 
-        viewModel.send(RowIntent.AuthorizationCodeReceived("bad-code"))
+        viewModel.send(RowIntent.AuthorizationCodeReceived("bad-code", codeVerifier = null))
         advanceUntilIdle()
 
         assertFalse(viewModel.state.value.isLoading)
