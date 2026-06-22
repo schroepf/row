@@ -18,7 +18,8 @@ class RowScreenSnapshotTest {
             MaterialTheme {
                 RowScreen(
                     state = RowState(),
-                    onLogin = {}
+                    onLogin = {},
+                    onLogout = {}
                 )
             }
         }
@@ -30,7 +31,8 @@ class RowScreenSnapshotTest {
             MaterialTheme {
                 RowScreen(
                     state = RowState(isLoading = true),
-                    onLogin = {}
+                    onLogin = {},
+                    onLogout = {}
                 )
             }
         }
@@ -49,7 +51,8 @@ class RowScreenSnapshotTest {
                             country = "GBR"
                         )
                     ),
-                    onLogin = {}
+                    onLogin = {},
+                    onLogout = {}
                 )
             }
         }
@@ -61,7 +64,8 @@ class RowScreenSnapshotTest {
             MaterialTheme {
                 RowScreen(
                     state = RowState(error = "invalid_grant"),
-                    onLogin = {}
+                    onLogin = {},
+                    onLogout = {}
                 )
             }
         }

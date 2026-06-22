@@ -24,7 +24,8 @@ fun RowApp(
     val state by viewModel.state.collectAsState()
     RowScreen(
         state = state,
-        onLogin = onLogin
+        onLogin = onLogin,
+        onLogout = { viewModel.send(RowIntent.Logout) }
     )
 }
 
@@ -32,6 +33,7 @@ fun RowApp(
 fun RowScreen(
     state: RowState,
     onLogin: () -> Unit,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -104,16 +106,21 @@ fun RowScreen(
             }
         }
 
-        Button(
-            modifier = Modifier.padding(top = 16.dp),
-            onClick = onLogin,
-            enabled = !state.isLoading
-        ) {
-            Text(
-                text = stringResource(
-                    id = if (state.profile == null) R.string.login else R.string.login_again
-                )
-            )
+        if (state.profile != null) {
+            Button(
+                modifier = Modifier.padding(top = 16.dp),
+                onClick = onLogout
+            ) {
+                Text(text = stringResource(id = R.string.logout))
+            }
+        } else {
+            Button(
+                modifier = Modifier.padding(top = 16.dp),
+                onClick = onLogin,
+                enabled = !state.isLoading
+            ) {
+                Text(text = stringResource(id = R.string.login))
+            }
         }
     }
 }

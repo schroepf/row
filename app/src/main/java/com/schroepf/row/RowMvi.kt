@@ -5,12 +5,14 @@ import com.schroepf.row.api.log.UserProfile
 sealed interface RowIntent {
     data class AuthorizationCodeReceived(val code: String, val codeVerifier: String?) : RowIntent
     data class LoginFailed(val error: String) : RowIntent
+    data object Logout : RowIntent
 }
 
 sealed interface RowResult {
     data object Loading : RowResult
     data class Success(val profile: UserProfile) : RowResult
     data class Failure(val error: String) : RowResult
+    data object LoggedOut : RowResult
 }
 
 data class RowState(
@@ -24,5 +26,6 @@ object RowReducer {
         RowResult.Loading -> current.copy(isLoading = true, error = null)
         is RowResult.Success -> current.copy(isLoading = false, profile = result.profile, error = null)
         is RowResult.Failure -> current.copy(isLoading = false, profile = null, error = result.error)
+        RowResult.LoggedOut -> RowState()
     }
 }

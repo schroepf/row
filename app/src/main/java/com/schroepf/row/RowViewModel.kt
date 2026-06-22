@@ -29,6 +29,9 @@ class RowViewModel(
             is RowIntent.LoginFailed -> {
                 _state.update { RowReducer.reduce(it, RowResult.Failure(intent.error)) }
             }
+            RowIntent.Logout -> {
+                _state.update { RowReducer.reduce(it, RowResult.LoggedOut) }
+            }
         }
     }
 

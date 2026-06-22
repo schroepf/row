@@ -2,6 +2,7 @@
     <string name="app_name">row</string>
     <string name="login">Log in to Concept2</string>
     <string name="login_again">Log in again</string>
+    <string name="logout">Log out</string>
     <string name="loading">Loading your Concept2 profile…</string>
     <string name="login_prompt">Log in to Concept2 Logbook to load your profile.</string>
     <string name="login_failed_generic">Concept2 login failed.</string>
