@@ -41,3 +41,6 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# macOS
+.DS_Store
