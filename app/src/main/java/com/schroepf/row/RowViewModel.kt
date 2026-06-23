@@ -3,6 +3,9 @@ package com.schroepf.row
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.schroepf.row.api.auth.Concept2Auth
+import com.schroepf.row.api.log.KtorRowApi
+import com.schroepf.row.api.log.RowApi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -12,9 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.schroepf.row.api.auth.concept2AuthConfig
-import com.schroepf.row.api.log.KtorRowApi
-import com.schroepf.row.api.log.RowApi
 import kotlinx.serialization.json.Json
 
 class RowViewModel(
@@ -29,6 +29,7 @@ class RowViewModel(
             is RowIntent.LoginFailed -> {
                 _state.update { RowReducer.reduce(it, RowResult.Failure(intent.error)) }
             }
+
             RowIntent.Logout -> {
                 _state.update { RowReducer.reduce(it, RowResult.LoggedOut) }
             }
@@ -63,7 +64,7 @@ class RowViewModel(
                         }
                     }
                     @Suppress("UNCHECKED_CAST")
-                    return RowViewModel(KtorRowApi(client, concept2AuthConfig())) as T
+                    return RowViewModel(KtorRowApi(client, Concept2Auth.concept2AuthConfig)) as T
                 }
             }
     }

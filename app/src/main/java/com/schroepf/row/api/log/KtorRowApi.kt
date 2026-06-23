@@ -24,7 +24,7 @@ class KtorRowApi(
                 append("client_secret", authConfig.clientSecret)
                 append("code", authorizationCode)
                 append("grant_type", "authorization_code")
-                append("redirect_uri", authConfig.redirectUri.toString())
+                append("redirect_uri", authConfig.redirectUri)
                 append("scope", ApiConstants.CONCEPT2_SCOPE)
                 if (codeVerifier != null) append("code_verifier", codeVerifier)
             }

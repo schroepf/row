@@ -7,8 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import com.schroepf.row.api.auth.buildAuthorizationRequest
-import com.schroepf.row.api.auth.concept2AuthConfig
+import com.schroepf.row.api.auth.Concept2Auth
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
@@ -35,7 +34,8 @@ class MainActivity : ComponentActivity() {
                 exception != null -> {
                     viewModel.send(
                         RowIntent.LoginFailed(
-                            exception.errorDescription ?: exception.error ?: getString(R.string.login_failed_generic)
+                            exception.errorDescription ?: exception.error
+                            ?: getString(R.string.login_failed_generic)
                         )
                     )
                 }
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
     private fun launchConcept2Login() {
         authorizationLauncher.launch(
             authorizationService.getAuthorizationRequestIntent(
-                buildAuthorizationRequest(concept2AuthConfig())
+                Concept2Auth.concept2AuthorizationRequest
             )
         )
     }

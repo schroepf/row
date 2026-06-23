@@ -1,25 +1,24 @@
 package com.schroepf.row.api.auth
 
-import android.net.Uri
-import com.schroepf.row.BuildConfig
+import androidx.core.net.toUri
 import com.schroepf.row.api.ApiConstants
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
 
-fun concept2AuthConfig(): Concept2AuthConfig = Concept2AuthConfig(
-    clientId = BuildConfig.CONCEPT2_CLIENT_ID,
-    clientSecret = BuildConfig.CONCEPT2_CLIENT_SECRET,
-    redirectUri = Uri.parse(BuildConfig.CONCEPT2_REDIRECT_URI)
-)
 
-fun buildAuthorizationRequest(config: Concept2AuthConfig): AuthorizationRequest =
-    AuthorizationRequest.Builder(
+object Concept2Auth {
+    val concept2AuthConfig: Concept2AuthConfig = Concept2AuthConfig()
+
+    val concept2AuthorizationRequest: AuthorizationRequest = AuthorizationRequest.Builder(
         AuthorizationServiceConfiguration(
-            Uri.parse(ApiConstants.CONCEPT2_AUTHORIZATION_ENDPOINT),
-            Uri.parse(ApiConstants.CONCEPT2_TOKEN_ENDPOINT)
+            ApiConstants.CONCEPT2_AUTHORIZATION_ENDPOINT.toUri(),
+            ApiConstants.CONCEPT2_TOKEN_ENDPOINT.toUri()
         ),
-        config.clientId,
+        concept2AuthConfig.clientId,
         ResponseTypeValues.CODE,
-        config.redirectUri
-    ).setScope(ApiConstants.CONCEPT2_SCOPE).build()
+        concept2AuthConfig.redirectUri.toUri()
+    )
+        .setScope(ApiConstants.CONCEPT2_SCOPE)
+        .build()
+}
