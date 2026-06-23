@@ -5,10 +5,12 @@ import com.schroepf.row.api.log.UserProfile
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import androidx.compose.material3.MaterialTheme
+import com.schroepf.row.ui.profile.ProfileScreen
+import com.schroepf.row.ui.profile.ProfileState
 import org.junit.Rule
 import org.junit.Test
 
-class RowScreenSnapshotTest {
+class ProfileScreenSnapshotTest {
     @get:Rule
     val paparazzi = Paparazzi(deviceConfig = DeviceConfig.PIXEL_5)
 
@@ -16,8 +18,8 @@ class RowScreenSnapshotTest {
     fun `renders signed out state`() {
         paparazzi.snapshot {
             MaterialTheme {
-                RowScreen(
-                    state = RowState(),
+                ProfileScreen(
+                    state = ProfileState(),
                     onLogin = {},
                     onLogout = {}
                 )
@@ -29,8 +31,8 @@ class RowScreenSnapshotTest {
     fun `renders loading state`() {
         paparazzi.snapshot {
             MaterialTheme {
-                RowScreen(
-                    state = RowState(isLoading = true),
+                ProfileScreen(
+                    state = ProfileState(isLoading = true),
                     onLogin = {},
                     onLogout = {}
                 )
@@ -42,8 +44,8 @@ class RowScreenSnapshotTest {
     fun `renders success state`() {
         paparazzi.snapshot {
             MaterialTheme {
-                RowScreen(
-                    state = RowState(
+                ProfileScreen(
+                    state = ProfileState(
                         profile = UserProfile(
                             username = "davidhart",
                             fullName = "David Hart",
@@ -62,8 +64,8 @@ class RowScreenSnapshotTest {
     fun `renders error state`() {
         paparazzi.snapshot {
             MaterialTheme {
-                RowScreen(
-                    state = RowState(error = "invalid_grant"),
+                ProfileScreen(
+                    state = ProfileState(error = "invalid_grant"),
                     onLogin = {},
                     onLogout = {}
                 )

@@ -8,12 +8,15 @@ import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import com.schroepf.row.api.auth.Concept2Auth
+import com.schroepf.row.ui.profile.RowApp
+import com.schroepf.row.ui.profile.ProfileIntent
+import com.schroepf.row.ui.profile.ProfileViewModel
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: RowViewModel by viewModels { RowViewModel.factory() }
+    private val viewModel: ProfileViewModel by viewModels { ProfileViewModel.factory() }
     private lateinit var authorizationService: AuthorizationService
 
     private val authorizationLauncher =
@@ -24,7 +27,7 @@ class MainActivity : ComponentActivity() {
             when {
                 response?.authorizationCode != null -> {
                     viewModel.send(
-                        RowIntent.AuthorizationCodeReceived(
+                        ProfileIntent.AuthorizationCodeReceived(
                             code = response.authorizationCode!!,
                             codeVerifier = response.request.codeVerifier
                         )
@@ -33,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
                 exception != null -> {
                     viewModel.send(
-                        RowIntent.LoginFailed(
+                        ProfileIntent.LoginFailed(
                             exception.errorDescription ?: exception.error
                             ?: getString(R.string.login_failed_generic)
                         )
@@ -41,7 +44,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 else -> {
-                    viewModel.send(RowIntent.LoginFailed(getString(R.string.login_failed_generic)))
+                    viewModel.send(ProfileIntent.LoginFailed(getString(R.string.login_failed_generic)))
                 }
             }
         }

@@ -2,6 +2,8 @@ package com.schroepf.row
 
 import com.schroepf.row.api.log.RowApi
 import com.schroepf.row.api.log.UserProfile
+import com.schroepf.row.ui.profile.ProfileIntent
+import com.schroepf.row.ui.profile.ProfileViewModel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +23,7 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RowViewModelTest {
+class ProfileViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
@@ -34,9 +36,12 @@ class RowViewModelTest {
 
     @Test
     fun `authorization code loads concept2 profile`() = runTest {
-        val viewModel = RowViewModel(
+        val viewModel = ProfileViewModel(
             rowApi = object : RowApi {
-                override suspend fun fetchUserProfile(authorizationCode: String, codeVerifier: String?): UserProfile {
+                override suspend fun fetchUserProfile(
+                    authorizationCode: String,
+                    codeVerifier: String?
+                ): UserProfile {
                     delay(1)
                     assertEquals("auth-code", authorizationCode)
                     return profile
@@ -44,7 +49,7 @@ class RowViewModelTest {
             }
         )
 
-        viewModel.send(RowIntent.AuthorizationCodeReceived("auth-code", codeVerifier = null))
+        viewModel.send(ProfileIntent.AuthorizationCodeReceived("auth-code", codeVerifier = null))
 
         assertTrue(viewModel.state.value.isLoading)
         advanceUntilIdle()
@@ -56,15 +61,18 @@ class RowViewModelTest {
 
     @Test
     fun `authorization code failure exposes error`() = runTest {
-        val viewModel = RowViewModel(
+        val viewModel = ProfileViewModel(
             rowApi = object : RowApi {
-                override suspend fun fetchUserProfile(authorizationCode: String, codeVerifier: String?): UserProfile {
+                override suspend fun fetchUserProfile(
+                    authorizationCode: String,
+                    codeVerifier: String?
+                ): UserProfile {
                     throw IllegalStateException("invalid_grant")
                 }
             }
         )
 
-        viewModel.send(RowIntent.AuthorizationCodeReceived("bad-code", codeVerifier = null))
+        viewModel.send(ProfileIntent.AuthorizationCodeReceived("bad-code", codeVerifier = null))
         advanceUntilIdle()
 
         assertFalse(viewModel.state.value.isLoading)

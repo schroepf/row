@@ -1,4 +1,4 @@
-package com.schroepf.row
+package com.schroepf.row.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -17,37 +17,37 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class RowViewModel(
+class ProfileViewModel(
     private val rowApi: RowApi
 ) : ViewModel() {
-    private val _state = MutableStateFlow(RowState())
-    val state: StateFlow<RowState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(ProfileState())
+    val state: StateFlow<ProfileState> = _state.asStateFlow()
 
-    fun send(intent: RowIntent) {
+    fun send(intent: ProfileIntent) {
         when (intent) {
-            is RowIntent.AuthorizationCodeReceived -> loadProfile(intent.code, intent.codeVerifier)
-            is RowIntent.LoginFailed -> {
-                _state.update { RowReducer.reduce(it, RowResult.Failure(intent.error)) }
+            is ProfileIntent.AuthorizationCodeReceived -> loadProfile(intent.code, intent.codeVerifier)
+            is ProfileIntent.LoginFailed -> {
+                _state.update { ProfileReducer.reduce(it, ProfileResult.Failure(intent.error)) }
             }
 
-            RowIntent.Logout -> {
-                _state.update { RowReducer.reduce(it, RowResult.LoggedOut) }
+            ProfileIntent.Logout -> {
+                _state.update { ProfileReducer.reduce(it, ProfileResult.LoggedOut) }
             }
         }
     }
 
     private fun loadProfile(authorizationCode: String, codeVerifier: String?) {
-        _state.update { RowReducer.reduce(it, RowResult.Loading) }
+        _state.update { ProfileReducer.reduce(it, ProfileResult.Loading) }
         viewModelScope.launch {
             runCatching {
                 rowApi.fetchUserProfile(authorizationCode, codeVerifier)
             }.onSuccess { profile ->
-                _state.update { RowReducer.reduce(it, RowResult.Success(profile)) }
+                _state.update { ProfileReducer.reduce(it, ProfileResult.Success(profile)) }
             }.onFailure { throwable ->
                 _state.update {
-                    RowReducer.reduce(
+                    ProfileReducer.reduce(
                         it,
-                        RowResult.Failure(throwable.message ?: "Unexpected error")
+                        ProfileResult.Failure(throwable.message ?: "Unexpected error")
                     )
                 }
             }
@@ -64,7 +64,7 @@ class RowViewModel(
                         }
                     }
                     @Suppress("UNCHECKED_CAST")
-                    return RowViewModel(KtorRowApi(client, Concept2Auth.concept2AuthConfig)) as T
+                    return ProfileViewModel(KtorRowApi(client, Concept2Auth.concept2AuthConfig)) as T
                 }
             }
     }
