@@ -1,9 +1,7 @@
-package com.schroepf.row
+package com.schroepf.row.ui.profile
 
 import com.schroepf.row.api.log.RowApi
 import com.schroepf.row.api.log.UserProfile
-import com.schroepf.row.ui.profile.ProfileIntent
-import com.schroepf.row.ui.profile.ProfileViewModel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -1,14 +1,7 @@
-package com.schroepf.row
+package com.schroepf.row.ui.profile
 
 import com.schroepf.row.api.log.UserProfile
-import com.schroepf.row.ui.profile.ProfileReducer
-import com.schroepf.row.ui.profile.ProfileResult
-import com.schroepf.row.ui.profile.ProfileState
-
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Test
 
 class ProfileReducerTest {
@@ -25,9 +18,9 @@ class ProfileReducerTest {
 
         val result = ProfileReducer.reduce(initial, ProfileResult.Loading)
 
-        assertTrue(result.isLoading)
-        assertEquals(profile, result.profile)
-        assertNull(result.error)
+        Assert.assertTrue(result.isLoading)
+        Assert.assertEquals(profile, result.profile)
+        Assert.assertNull(result.error)
     }
 
     @Test
@@ -36,9 +29,9 @@ class ProfileReducerTest {
 
         val result = ProfileReducer.reduce(initial, ProfileResult.Success(profile))
 
-        assertFalse(result.isLoading)
-        assertEquals(profile, result.profile)
-        assertNull(result.error)
+        Assert.assertFalse(result.isLoading)
+        Assert.assertEquals(profile, result.profile)
+        Assert.assertNull(result.error)
     }
 
     @Test
@@ -47,8 +40,8 @@ class ProfileReducerTest {
 
         val result = ProfileReducer.reduce(initial, ProfileResult.Failure("network failed"))
 
-        assertFalse(result.isLoading)
-        assertNull(result.profile)
-        assertEquals("network failed", result.error)
+        Assert.assertFalse(result.isLoading)
+        Assert.assertNull(result.profile)
+        Assert.assertEquals("network failed", result.error)
     }
 }

@@ -1,18 +1,15 @@
-package com.schroepf.row
+package com.schroepf.row.ui.profile
 
-import com.schroepf.row.api.log.UserProfile
-
+import androidx.compose.material3.MaterialTheme
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
-import androidx.compose.material3.MaterialTheme
-import com.schroepf.row.ui.profile.ProfileScreen
-import com.schroepf.row.ui.profile.ProfileState
+import com.schroepf.row.api.log.UserProfile
 import org.junit.Rule
 import org.junit.Test
 
 class ProfileScreenSnapshotTest {
     @get:Rule
-    val paparazzi = Paparazzi(deviceConfig = DeviceConfig.PIXEL_5)
+    val paparazzi = Paparazzi(deviceConfig = DeviceConfig.Companion.PIXEL_5)
 
     @Test
     fun `renders signed out state`() {
