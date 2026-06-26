@@ -1,11 +1,11 @@
 package com.schroepf.row
 
+import com.schroepf.row.ui.theme.RowTheme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import com.schroepf.row.api.auth.Concept2Auth
 import com.schroepf.row.ui.profile.RowApp
@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         authorizationService = AuthorizationService(this)
         setContent {
-            MaterialTheme {
+            RowTheme {
                 Surface {
                     RowApp(
                         viewModel = viewModel,
