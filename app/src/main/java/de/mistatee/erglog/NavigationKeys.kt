@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName")
 package de.mistatee.erglog
 
 import androidx.navigation3.runtime.NavKey

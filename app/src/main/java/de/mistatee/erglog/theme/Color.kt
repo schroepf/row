@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package de.mistatee.erglog.theme
 
 import androidx.compose.ui.graphics.Color

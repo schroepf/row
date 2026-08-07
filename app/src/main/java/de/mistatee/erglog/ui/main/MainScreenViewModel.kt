@@ -15,7 +15,7 @@ class MainScreenViewModel(dataRepository: DataRepository) : ViewModel() {
         dataRepository.data
             .map<List<String>, MainScreenUiState>(::Success)
             .catch { emit(MainScreenUiState.Error(it)) }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MainScreenUiState.Loading)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), MainScreenUiState.Loading)
 }
 
 sealed interface MainScreenUiState {

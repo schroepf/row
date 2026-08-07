@@ -14,7 +14,6 @@ import de.mistatee.erglog.theme.ErgLogTheme
 
 @Composable
 fun MainScreen(
-    onItemClick: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) },
 ) {
