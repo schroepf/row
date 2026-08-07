@@ -6,7 +6,8 @@
 ._*
 
 # Custom folder icons
-Icon
+Icon
+
 
 # Volume root files
 .DocumentRevisions-V100
@@ -35,34 +36,33 @@ captures/
 *.apk
 output.json
 
-# IntelliJ
-*.iml
-.idea/
-
 # Keystore files
 *.jks
 *.keystore
 
 ### JetBrains
 # JetBrains IDE directory
+*.iml
 .idea/
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
 
 # CMake build directories
 cmake-build-*/
 
 # File-based project format
 *.iws
-*.iml
 
 # IntelliJ build output
 out/
 
-### Java
+### Java/Kotlin
 # Compiled class file
 *.class
-
-# Log file
-*.log
 
 # Package Files
 *.jar
@@ -72,26 +72,6 @@ out/
 # Virtual machine crash logs
 hs_err_pid*
 replay_pid*
-
-### Kotlin
-# Compiled class file
-*.class
-
-# Log file
-*.log
-
-# Package Files
-*.jar
-*.war
-*.ear
-
-# Virtual machine crash logs
-hs_err_pid*
-replay_pid*
-
-# Gradle
-.gradle/
-build/
 
 # Maven
 target/
