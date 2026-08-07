@@ -1,3 +1,7 @@
+## Verification
+
+For every change in this codebase, `./gradlew check connectedCheck` must pass.
+
 ## Agent skills
 
 ### Issue tracker
