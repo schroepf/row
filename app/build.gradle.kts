@@ -1,9 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.detekt)
 }
+
+val localProperties =
+    Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { load(it) }
+        }
+    }
 
 android {
     namespace = "de.mistatee.erglog"
@@ -14,6 +24,19 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
+
+        // Concept2 Client Credentials, read from local.properties (gitignored) so the
+        // real client_secret never gets committed. See docs/adr/0002-client-secret-shipped-in-app.md.
+        buildConfigField(
+            "String",
+            "C2_CLIENT_ID",
+            "\"${localProperties.getProperty("c2ClientId", "")}\"",
+        )
+        buildConfigField(
+            "String",
+            "C2_CLIENT_SECRET",
+            "\"${localProperties.getProperty("c2ClientSecret", "")}\"",
+        )
     }
 
     buildTypes {
@@ -25,11 +48,12 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
         aidl = false
-        buildConfig = false
+        buildConfig = true
         shaders = false
     }
 
@@ -37,6 +61,12 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+
+    lint {
+        // Ktor's ktor-utils-jvm ships a JVM-only debug-detector class referencing
+        // java.lang.management that is never reached on Android; false positive.
+        disable += "InvalidPackage"
     }
 }
 
@@ -89,4 +119,18 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
+    // Networking (Concept2 Logbook API OAuth2 + REST calls)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.serialization.json)
+
+    // OAuth login: Custom Tabs + encrypted token storage
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.security.crypto)
+
+    // java.time.Instant support on minSdk 24
+    coreLibraryDesugaring(libs.android.desugar.jdk.libs)
 }
