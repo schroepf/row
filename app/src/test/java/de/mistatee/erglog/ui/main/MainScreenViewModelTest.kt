@@ -4,6 +4,7 @@ import de.mistatee.erglog.data.profile.Profile
 import de.mistatee.erglog.data.profile.ProfileRepository
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -14,6 +15,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainScreenViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 

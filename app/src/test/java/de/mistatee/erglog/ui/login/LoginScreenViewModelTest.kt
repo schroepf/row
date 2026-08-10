@@ -3,6 +3,7 @@ package de.mistatee.erglog.ui.login
 import de.mistatee.erglog.data.auth.AuthRepository
 import de.mistatee.erglog.data.auth.Session
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -14,6 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LoginScreenViewModelTest {
     @Before
     fun setUp() {
