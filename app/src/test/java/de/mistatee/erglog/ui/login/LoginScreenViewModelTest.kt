@@ -84,5 +84,7 @@ private class FakeAuthRepository(
 
     override suspend fun refreshSession(): Result<Session> = error("not stubbed")
 
+    override suspend fun validSession(): Result<Session> = error("not stubbed")
+
     override suspend fun logout() = Unit
 }

@@ -1,16 +1,13 @@
 package de.mistatee.erglog.data.auth
 
 import de.mistatee.erglog.BuildConfig
+import de.mistatee.erglog.data.defaultHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 
 private const val AUTHORIZE_URL = "https://log.concept2.com/oauth/authorize"
 private const val TOKEN_URL = "https://log.concept2.com/oauth/access_token"
@@ -78,10 +75,3 @@ class KtorAuthApi(
         )
     }
 }
-
-internal fun defaultHttpClient(): HttpClient =
-    HttpClient(Android) {
-        install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true })
-        }
-    }

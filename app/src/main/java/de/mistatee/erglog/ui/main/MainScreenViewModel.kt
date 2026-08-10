@@ -2,20 +2,23 @@ package de.mistatee.erglog.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.mistatee.erglog.data.DataRepository
-import de.mistatee.erglog.ui.main.MainScreenUiState.Success
-import kotlinx.coroutines.flow.SharingStarted
+import de.mistatee.erglog.data.profile.ProfileRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class MainScreenViewModel(dataRepository: DataRepository) : ViewModel() {
-    val uiState: StateFlow<MainScreenUiState> =
-        dataRepository.data
-            .map<List<String>, MainScreenUiState>(::Success)
-            .catch { emit(MainScreenUiState.Error(it)) }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), MainScreenUiState.Loading)
+class MainScreenViewModel(private val profileRepository: ProfileRepository) : ViewModel() {
+    private val mutableUiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
+    val uiState: StateFlow<MainScreenUiState> = mutableUiState
+
+    init {
+        viewModelScope.launch {
+            profileRepository
+                .fetchProfile()
+                .onSuccess { mutableUiState.value = MainScreenUiState.Success(it.username) }
+                .onFailure { mutableUiState.value = MainScreenUiState.Error(it) }
+        }
+    }
 }
 
 sealed interface MainScreenUiState {
@@ -23,5 +26,5 @@ sealed interface MainScreenUiState {
 
     data class Error(val throwable: Throwable) : MainScreenUiState
 
-    data class Success(val data: List<String>) : MainScreenUiState
+    data class Success(val username: String) : MainScreenUiState
 }

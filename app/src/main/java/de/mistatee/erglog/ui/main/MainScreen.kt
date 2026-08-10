@@ -7,15 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation3.runtime.NavKey
-import de.mistatee.erglog.data.DefaultDataRepository
 import de.mistatee.erglog.theme.ErgLogTheme
 
 @Composable
 fun MainScreen(
+    viewModel: MainScreenViewModel,
     modifier: Modifier = Modifier,
-    viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) },
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     when (state) {
@@ -24,7 +21,7 @@ fun MainScreen(
         }
 
         is MainScreenUiState.Success -> {
-            MainScreen(data = (state as MainScreenUiState.Success).data, modifier = modifier)
+            MainScreen(username = (state as MainScreenUiState.Success).username, modifier = modifier)
         }
 
         is MainScreenUiState.Error -> {
@@ -34,8 +31,8 @@ fun MainScreen(
 }
 
 @Composable
-internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
-    Column(modifier) { data.forEach { Greeting(it) } }
+internal fun MainScreen(username: String, modifier: Modifier = Modifier) {
+    Column(modifier) { Greeting(username) }
 }
 
 @Composable
@@ -46,11 +43,11 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    ErgLogTheme { MainScreen(listOf("Android")) }
+    ErgLogTheme { MainScreen(username = "Android") }
 }
 
 @Preview(showBackground = true, widthDp = 340)
 @Composable
 fun MainScreenPortraitPreview() {
-    ErgLogTheme { MainScreen(listOf("Android")) }
+    ErgLogTheme { MainScreen(username = "Android") }
 }

@@ -31,4 +31,11 @@ _Avoid_: permission, access level
 **Session**:
 The app's local record that a Logbook Account holder is currently authenticated, backed by a stored Access Token and Refresh Token. Its absence means the holder must go through authorization again.
 _Avoid_: login state, auth state
+
+**Profile**:
+The Logbook Account holder's profile data (username, first/last name, email, etc.) as returned by Concept2's `/api/users/{user}` endpoint.
+_Avoid_: User, Account Details
+
+**Valid Session**:
+A [Session](#session) whose Access Token is confirmed usable right now — either still fresh, or freshly refreshed. Distinct from merely having *a* Session on record, which may hold a stale Access Token.
 </content>

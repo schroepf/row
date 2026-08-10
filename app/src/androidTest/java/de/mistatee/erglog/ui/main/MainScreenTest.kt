@@ -15,13 +15,13 @@ class MainScreenTest {
 
     @Before
     fun setup() {
-        composeTestRule.setContent { MainScreen(FAKE_DATA) }
+        composeTestRule.setContent { MainScreen(username = FAKE_USERNAME) }
     }
 
     @Test
-    fun firstItem_exists() {
-        FAKE_DATA.forEach { composeTestRule.onNodeWithText("Hello $it!").assertExists() }
+    fun username_exists() {
+        composeTestRule.onNodeWithText("Hello $FAKE_USERNAME!").assertExists()
     }
 }
 
-private val FAKE_DATA = listOf("Sample1", "Sample2", "Sample3")
+private const val FAKE_USERNAME = "Sample1"
