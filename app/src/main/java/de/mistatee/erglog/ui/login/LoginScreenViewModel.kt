@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LoginScreenViewModel(private val authRepository: AuthRepository) : ViewModel() {
-    private val mutableUiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
-    val uiState: StateFlow<LoginUiState> = mutableUiState
+    val uiState: StateFlow<LoginUiState>
+        field = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
 
     val authorizationUrl: String = buildAuthorizationUrl()
 
@@ -21,31 +21,22 @@ class LoginScreenViewModel(private val authRepository: AuthRepository) : ViewMod
      */
     fun onAuthorizationResult(code: String?, error: String?) {
         if (error != null || code == null) {
-            mutableUiState.value = LoginUiState.Error("Login was cancelled or denied.")
+            uiState.value = LoginUiState.Error("Login was cancelled or denied.")
             return
         }
-        mutableUiState.value = LoginUiState.Loading
+        uiState.value = LoginUiState.Loading
         viewModelScope.launch {
             authRepository
                 .completeLogin(code)
-                .onSuccess { mutableUiState.value = LoginUiState.LoggedIn }
+                .onSuccess { uiState.value = LoginUiState.LoggedIn }
                 .onFailure {
-                    mutableUiState.value = LoginUiState.Error(it.message ?: "Login failed.")
+                    uiState.value = LoginUiState.Error(it.message ?: "Login failed.")
                 }
         }
     }
 
     fun onRetry() {
-        mutableUiState.value = LoginUiState.Idle
+        uiState.value = LoginUiState.Idle
     }
 }
 
-sealed interface LoginUiState {
-    data object Idle : LoginUiState
-
-    data object Loading : LoginUiState
-
-    data object LoggedIn : LoginUiState
-
-    data class Error(val message: String) : LoginUiState
-}

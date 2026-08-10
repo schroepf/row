@@ -8,23 +8,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MainScreenViewModel(private val profileRepository: ProfileRepository) : ViewModel() {
-    private val mutableUiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
-    val uiState: StateFlow<MainScreenUiState> = mutableUiState
+    val uiState: StateFlow<MainScreenUiState>
+        field = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
 
     init {
         viewModelScope.launch {
             profileRepository
                 .fetchProfile()
-                .onSuccess { mutableUiState.value = MainScreenUiState.Success(it.username) }
-                .onFailure { mutableUiState.value = MainScreenUiState.Error(it) }
+                .onSuccess { uiState.value = MainScreenUiState.Success(it.username) }
+                .onFailure { uiState.value = MainScreenUiState.Error(it) }
         }
     }
 }
 
-sealed interface MainScreenUiState {
-    object Loading : MainScreenUiState
-
-    data class Error(val throwable: Throwable) : MainScreenUiState
-
-    data class Success(val username: String) : MainScreenUiState
-}
