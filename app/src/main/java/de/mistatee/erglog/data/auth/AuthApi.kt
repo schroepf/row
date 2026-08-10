@@ -1,7 +1,6 @@
 package de.mistatee.erglog.data.auth
 
 import de.mistatee.erglog.BuildConfig
-import de.mistatee.erglog.data.defaultHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
@@ -33,7 +32,7 @@ interface AuthApi {
 }
 
 class KtorAuthApi(
-    private val httpClient: HttpClient = defaultHttpClient(),
+    private val httpClient: HttpClient,
 ) : AuthApi {
     override suspend fun exchangeAuthorizationCode(code: String): TokenResponse =
         requestToken(

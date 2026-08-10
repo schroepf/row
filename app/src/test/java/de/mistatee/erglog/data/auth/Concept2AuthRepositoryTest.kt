@@ -1,21 +1,25 @@
 package de.mistatee.erglog.data.auth
 
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class DefaultAuthRepositoryTest {
+class Concept2AuthRepositoryTest {
     @Test
     fun completeLogin_onSuccess_savesSession() =
         runTest {
-            val sessionStore = FakeSessionStore()
-            val repository =
-                DefaultAuthRepository(
-                    FakeAuthApi(exchangeResult = { SAMPLE_TOKEN_RESPONSE }),
-                    sessionStore,
-                )
+            val sessionStore = mockk<SessionStore>()
+            var savedSession: Session? = null
+            coEvery { sessionStore.saveSession(any()) } answers { savedSession = firstArg() }
+            coEvery { sessionStore.getSession() } answers { savedSession }
+            val authApi = mockk<AuthApi>()
+            coEvery { authApi.exchangeAuthorizationCode("auth-code") } returns SAMPLE_TOKEN_RESPONSE
+            val repository = Concept2AuthRepository(authApi, sessionStore)
 
             val result = repository.completeLogin("auth-code")
 
@@ -26,12 +30,11 @@ class DefaultAuthRepositoryTest {
     @Test
     fun completeLogin_onFailure_doesNotSaveSession() =
         runTest {
-            val sessionStore = FakeSessionStore()
-            val repository =
-                DefaultAuthRepository(
-                    FakeAuthApi(exchangeResult = { throw AuthException("invalid_grant", null) }),
-                    sessionStore,
-                )
+            val sessionStore = mockk<SessionStore>()
+            coEvery { sessionStore.getSession() } returns null
+            val authApi = mockk<AuthApi>()
+            coEvery { authApi.exchangeAuthorizationCode("bad-code") } throws AuthException("invalid_grant", null)
+            val repository = Concept2AuthRepository(authApi, sessionStore)
 
             val result = repository.completeLogin("bad-code")
 
@@ -42,12 +45,13 @@ class DefaultAuthRepositoryTest {
     @Test
     fun refreshSession_onAuthFailure_clearsSession() =
         runTest {
-            val sessionStore = FakeSessionStore().apply { saveSession(SAMPLE_SESSION) }
-            val repository =
-                DefaultAuthRepository(
-                    FakeAuthApi(refreshResult = { throw AuthException("invalid_grant", null) }),
-                    sessionStore,
-                )
+            val sessionStore = mockk<SessionStore>()
+            var currentSession: Session? = SAMPLE_SESSION
+            coEvery { sessionStore.getSession() } answers { currentSession }
+            coEvery { sessionStore.clearSession() } answers { currentSession = null }
+            val authApi = mockk<AuthApi>()
+            coEvery { authApi.refreshAccessToken(any()) } throws AuthException("invalid_grant", null)
+            val repository = Concept2AuthRepository(authApi, sessionStore)
 
             val result = repository.refreshSession()
 
@@ -58,8 +62,10 @@ class DefaultAuthRepositoryTest {
     @Test
     fun currentSession_returnsStoredSession() =
         runTest {
-            val sessionStore = FakeSessionStore().apply { saveSession(SAMPLE_SESSION) }
-            val repository = DefaultAuthRepository(FakeAuthApi(), sessionStore)
+            val sessionStore = mockk<SessionStore>()
+            coEvery { sessionStore.getSession() } returns SAMPLE_SESSION
+            val authApi = mockk<AuthApi>()
+            val repository = Concept2AuthRepository(authApi, sessionStore)
 
             assertEquals(SAMPLE_SESSION, repository.currentSession())
         }
@@ -69,17 +75,16 @@ class DefaultAuthRepositoryTest {
         runTest {
             val freshSession =
                 SAMPLE_SESSION.copy(accessTokenExpiry = java.time.Instant.now().plusSeconds(3600))
-            val sessionStore = FakeSessionStore().apply { saveSession(freshSession) }
-            val repository =
-                DefaultAuthRepository(
-                    FakeAuthApi(refreshResult = { error("should not be called") }),
-                    sessionStore,
-                )
+            val sessionStore = mockk<SessionStore>()
+            coEvery { sessionStore.getSession() } returns freshSession
+            val authApi = mockk<AuthApi>()
+            val repository = Concept2AuthRepository(authApi, sessionStore)
 
             val result = repository.validSession()
 
             assertTrue(result.isSuccess)
             assertEquals(freshSession, result.getOrNull())
+            coVerify(exactly = 0) { authApi.refreshAccessToken(any()) }
         }
 
     @Test
@@ -87,12 +92,13 @@ class DefaultAuthRepositoryTest {
         runTest {
             val staleSession =
                 SAMPLE_SESSION.copy(accessTokenExpiry = java.time.Instant.now().minusSeconds(1))
-            val sessionStore = FakeSessionStore().apply { saveSession(staleSession) }
-            val repository =
-                DefaultAuthRepository(
-                    FakeAuthApi(refreshResult = { SAMPLE_TOKEN_RESPONSE }),
-                    sessionStore,
-                )
+            val sessionStore = mockk<SessionStore>()
+            var currentSession: Session? = staleSession
+            coEvery { sessionStore.getSession() } answers { currentSession }
+            coEvery { sessionStore.saveSession(any()) } answers { currentSession = firstArg() }
+            val authApi = mockk<AuthApi>()
+            coEvery { authApi.refreshAccessToken(any()) } returns SAMPLE_TOKEN_RESPONSE
+            val repository = Concept2AuthRepository(authApi, sessionStore)
 
             val result = repository.validSession()
 
@@ -103,8 +109,10 @@ class DefaultAuthRepositoryTest {
     @Test
     fun validSession_withNoSession_failsWithNoSession() =
         runTest {
-            val sessionStore = FakeSessionStore()
-            val repository = DefaultAuthRepository(FakeAuthApi(), sessionStore)
+            val sessionStore = mockk<SessionStore>()
+            coEvery { sessionStore.getSession() } returns null
+            val authApi = mockk<AuthApi>()
+            val repository = Concept2AuthRepository(authApi, sessionStore)
 
             val result = repository.validSession()
 
@@ -117,13 +125,13 @@ class DefaultAuthRepositoryTest {
         runTest {
             val staleSession =
                 SAMPLE_SESSION.copy(accessTokenExpiry = java.time.Instant.now().minusSeconds(1))
-            val sessionStore = FakeSessionStore().apply { saveSession(staleSession) }
+            val sessionStore = mockk<SessionStore>()
+            coEvery { sessionStore.getSession() } returns staleSession
+            coEvery { sessionStore.clearSession() } returns Unit
             val cause = AuthException("invalid_grant", null)
-            val repository =
-                DefaultAuthRepository(
-                    FakeAuthApi(refreshResult = { throw cause }),
-                    sessionStore,
-                )
+            val authApi = mockk<AuthApi>()
+            coEvery { authApi.refreshAccessToken(any()) } throws cause
+            val repository = Concept2AuthRepository(authApi, sessionStore)
 
             val result = repository.validSession()
 
@@ -147,28 +155,5 @@ class DefaultAuthRepositoryTest {
                 refreshToken = "existing-refresh-token",
                 accessTokenExpiry = java.time.Instant.EPOCH,
             )
-    }
-}
-
-private class FakeAuthApi(
-    private val exchangeResult: () -> TokenResponse = { error("not stubbed") },
-    private val refreshResult: () -> TokenResponse = { error("not stubbed") },
-) : AuthApi {
-    override suspend fun exchangeAuthorizationCode(code: String): TokenResponse = exchangeResult()
-
-    override suspend fun refreshAccessToken(refreshToken: String): TokenResponse = refreshResult()
-}
-
-private class FakeSessionStore : SessionStore {
-    private var session: Session? = null
-
-    override suspend fun getSession(): Session? = session
-
-    override suspend fun saveSession(session: Session) {
-        this.session = session
-    }
-
-    override suspend fun clearSession() {
-        session = null
     }
 }

@@ -6,7 +6,7 @@ interface ProfileRepository {
     suspend fun fetchProfile(): Result<Profile>
 }
 
-class DefaultProfileRepository(
+class Concept2ProfileRepository(
     private val authRepository: AuthRepository,
     private val profileApi: ProfileApi,
 ) : ProfileRepository {

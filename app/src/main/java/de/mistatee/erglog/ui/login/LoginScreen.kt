@@ -14,11 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import de.mistatee.erglog.data.auth.AuthRedirectHolder
-import de.mistatee.erglog.data.auth.DefaultAuthRepository
-import de.mistatee.erglog.data.auth.EncryptedSessionStore
-import de.mistatee.erglog.data.auth.KtorAuthApi
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(
@@ -26,12 +23,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val viewModel: LoginScreenViewModel =
-        viewModel {
-            LoginScreenViewModel(
-                DefaultAuthRepository(KtorAuthApi(), EncryptedSessionStore(context.applicationContext)),
-            )
-        }
+    val viewModel: LoginScreenViewModel = koinViewModel<LoginScreenViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {

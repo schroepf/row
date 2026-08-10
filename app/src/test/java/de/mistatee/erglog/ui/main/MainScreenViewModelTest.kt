@@ -2,6 +2,8 @@ package de.mistatee.erglog.ui.main
 
 import de.mistatee.erglog.data.profile.Profile
 import de.mistatee.erglog.data.profile.ProfileRepository
+import io.mockk.coEvery
+import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,17 +34,18 @@ class MainScreenViewModelTest {
     @Test
     fun uiState_initiallyLoading() =
         runTest(testDispatcher) {
-            val viewModel = MainScreenViewModel(FakeProfileRepository())
+            val profileRepository = mockk<ProfileRepository>()
+            coEvery { profileRepository.fetchProfile() } coAnswers { awaitCancellation() }
+            val viewModel = MainScreenViewModel(profileRepository)
             assertEquals(MainScreenUiState.Loading, viewModel.uiState.value)
         }
 
     @Test
     fun uiState_onFetchSuccess_isDisplayed() =
         runTest(testDispatcher) {
-            val viewModel =
-                MainScreenViewModel(
-                    FakeProfileRepository(fetchProfileResult = { Result.success(Profile(username = "Sample")) }),
-                )
+            val profileRepository = mockk<ProfileRepository>()
+            coEvery { profileRepository.fetchProfile() } returns Result.success(Profile(username = "Sample"))
+            val viewModel = MainScreenViewModel(profileRepository)
 
             advanceUntilIdle()
 
@@ -53,17 +56,12 @@ class MainScreenViewModelTest {
     fun uiState_onFetchFailure_showsError() =
         runTest(testDispatcher) {
             val failure = IllegalStateException("boom")
-            val viewModel =
-                MainScreenViewModel(FakeProfileRepository(fetchProfileResult = { Result.failure(failure) }))
+            val profileRepository = mockk<ProfileRepository>()
+            coEvery { profileRepository.fetchProfile() } returns Result.failure(failure)
+            val viewModel = MainScreenViewModel(profileRepository)
 
             advanceUntilIdle()
 
             assertEquals(MainScreenUiState.Error(failure), viewModel.uiState.value)
         }
-}
-
-private class FakeProfileRepository(
-    private val fetchProfileResult: suspend () -> Result<Profile> = { awaitCancellation() },
-) : ProfileRepository {
-    override suspend fun fetchProfile(): Result<Profile> = fetchProfileResult()
 }

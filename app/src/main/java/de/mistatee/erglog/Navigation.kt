@@ -9,27 +9,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import de.mistatee.erglog.data.auth.DefaultAuthRepository
-import de.mistatee.erglog.data.auth.EncryptedSessionStore
-import de.mistatee.erglog.data.auth.KtorAuthApi
-import de.mistatee.erglog.data.profile.DefaultProfileRepository
-import de.mistatee.erglog.data.profile.KtorProfileApi
+import de.mistatee.erglog.data.auth.AuthRepository
 import de.mistatee.erglog.ui.login.LoginScreen
 import de.mistatee.erglog.ui.main.MainScreen
 import de.mistatee.erglog.ui.main.MainScreenViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun MainNavigation() {
-    val context = LocalContext.current
-    val authRepository =
-        remember { DefaultAuthRepository(KtorAuthApi(), EncryptedSessionStore(context.applicationContext)) }
-    val profileRepository = remember { DefaultProfileRepository(authRepository, KtorProfileApi()) }
+    val authRepository = koinInject<AuthRepository>()
     var hasSession by remember { mutableStateOf<Boolean?>(null) }
 
     LaunchedEffect(Unit) {
@@ -59,7 +52,7 @@ fun MainNavigation() {
                 }
                 entry<Main> {
                     MainScreen(
-                        viewModel = viewModel { MainScreenViewModel(profileRepository) },
+                        viewModel = koinViewModel<MainScreenViewModel>(),
                         modifier = Modifier
                             .safeDrawingPadding()
                             .padding(16.dp)

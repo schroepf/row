@@ -1,0 +1,3 @@
+# Use Koin for dependency injection
+
+Dependencies were being constructed manually at call sites (e.g. `Navigation.kt` and `LoginScreen.kt` each built their own `DefaultAuthRepository`/`EncryptedSessionStore`, silently running two independent session stores), and each API client defaulted to its own `HttpClient`, running two separate Ktor engines. We chose Koin over Hilt/Dagger for a single `appModule` DSL with no annotation processing/codegen, which suits this app's small graph (~8 definitions) and keeps build times light. Hilt is the more conventional choice for a plain Android app and offers compile-time graph validation that Koin lacks, so this trades some compile-time safety (mitigated by a `checkModules()` unit test) for less ceremony and faster builds.

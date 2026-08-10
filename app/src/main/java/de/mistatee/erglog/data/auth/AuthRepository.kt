@@ -37,7 +37,7 @@ interface AuthRepository {
     suspend fun logout()
 }
 
-class DefaultAuthRepository(
+class Concept2AuthRepository(
     private val authApi: AuthApi,
     private val sessionStore: SessionStore,
 ) : AuthRepository {

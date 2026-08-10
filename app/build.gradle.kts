@@ -90,51 +90,45 @@ dependencies {
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
-    // Core Android dependencies
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-
-    // Arch Components
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    // Compose
+    implementation(libs.androidx.browser)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    // Tooling
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    // Instrumented tests
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    // Local tests: jUnit, coroutines, Android runner
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-
-    // Instrumented tests: jUnit rules and runners
-    androidTestImplementation(libs.androidx.test.core)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-
-    // Navigation
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-
-    // Networking (Concept2 Logbook API OAuth2 + REST calls)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.kotlinx.serialization.json)
-
-    // OAuth login: Custom Tabs + encrypted token storage
-    implementation(libs.androidx.browser)
-    implementation(libs.androidx.datastore.preferences)
     implementation(libs.tink.android)
+
+    // Debug builds
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Unit tests
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
+
+    // Instrumented tests
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.espresso.core)
 
     // java.time.Instant support on minSdk 24
     coreLibraryDesugaring(libs.android.desugar.jdk.libs)

@@ -1,6 +1,5 @@
 package de.mistatee.erglog.data.profile
 
-import de.mistatee.erglog.data.defaultHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -20,7 +19,7 @@ interface ProfileApi {
 }
 
 class KtorProfileApi(
-    private val httpClient: HttpClient = defaultHttpClient(),
+    private val httpClient: HttpClient,
 ) : ProfileApi {
     override suspend fun fetchProfile(accessToken: String): Profile {
         val response =

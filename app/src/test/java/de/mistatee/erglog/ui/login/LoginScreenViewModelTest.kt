@@ -1,7 +1,8 @@
 package de.mistatee.erglog.ui.login
 
 import de.mistatee.erglog.data.auth.AuthRepository
-import de.mistatee.erglog.data.auth.Session
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -30,14 +31,16 @@ class LoginScreenViewModelTest {
     @Test
     fun uiState_initiallyIdle() =
         runTest {
-            val viewModel = LoginScreenViewModel(FakeAuthRepository())
+            val viewModel = LoginScreenViewModel(mockk<AuthRepository>())
             assertEquals(LoginUiState.Idle, viewModel.uiState.value)
         }
 
     @Test
     fun onAuthorizationResult_withCode_logsIn() =
         runTest {
-            val viewModel = LoginScreenViewModel(FakeAuthRepository(completeLoginResult = { Result.success(Unit) }))
+            val authRepository = mockk<AuthRepository>()
+            coEvery { authRepository.completeLogin("auth-code") } returns Result.success(Unit)
+            val viewModel = LoginScreenViewModel(authRepository)
 
             viewModel.onAuthorizationResult(code = "auth-code", error = null)
             advanceUntilIdle()
@@ -48,7 +51,7 @@ class LoginScreenViewModelTest {
     @Test
     fun onAuthorizationResult_withError_showsError() =
         runTest {
-            val viewModel = LoginScreenViewModel(FakeAuthRepository())
+            val viewModel = LoginScreenViewModel(mockk<AuthRepository>())
 
             viewModel.onAuthorizationResult(code = null, error = "access_denied")
 
@@ -58,7 +61,7 @@ class LoginScreenViewModelTest {
     @Test
     fun onAuthorizationResult_withoutCodeOrError_showsError() =
         runTest {
-            val viewModel = LoginScreenViewModel(FakeAuthRepository())
+            val viewModel = LoginScreenViewModel(mockk<AuthRepository>())
 
             viewModel.onAuthorizationResult(code = null, error = null)
 
@@ -68,25 +71,11 @@ class LoginScreenViewModelTest {
     @Test
     fun onRetry_resetsToIdle() =
         runTest {
-            val viewModel = LoginScreenViewModel(FakeAuthRepository())
+            val viewModel = LoginScreenViewModel(mockk<AuthRepository>())
             viewModel.onAuthorizationResult(code = null, error = "access_denied")
 
             viewModel.onRetry()
 
             assertEquals(LoginUiState.Idle, viewModel.uiState.value)
         }
-}
-
-private class FakeAuthRepository(
-    private val completeLoginResult: () -> Result<Unit> = { error("not stubbed") },
-) : AuthRepository {
-    override suspend fun currentSession(): Session? = null
-
-    override suspend fun completeLogin(code: String): Result<Unit> = completeLoginResult()
-
-    override suspend fun refreshSession(): Result<Session> = error("not stubbed")
-
-    override suspend fun validSession(): Result<Session> = error("not stubbed")
-
-    override suspend fun logout() = Unit
 }
