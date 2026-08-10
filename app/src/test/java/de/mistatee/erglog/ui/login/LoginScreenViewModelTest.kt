@@ -5,6 +5,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -36,13 +37,25 @@ class LoginScreenViewModelTest {
         }
 
     @Test
+    fun onAction_loginClicked_emitsOpenAuthorizationTabEffect() =
+        runTest {
+            val viewModel = LoginScreenViewModel(mockk<AuthRepository>())
+
+            viewModel.onAction(LoginAction.LoginClicked)
+            val effect = viewModel.effects.first()
+
+            assertTrue(effect is LoginEffect.OpenAuthorizationTab)
+            assertTrue((effect as LoginEffect.OpenAuthorizationTab).url.isNotBlank())
+        }
+
+    @Test
     fun onAuthorizationResult_withCode_logsIn() =
         runTest {
             val authRepository = mockk<AuthRepository>()
             coEvery { authRepository.completeLogin("auth-code") } returns Result.success(Unit)
             val viewModel = LoginScreenViewModel(authRepository)
 
-            viewModel.onAuthorizationResult(code = "auth-code", error = null)
+            viewModel.onAction(LoginAction.AuthorizationResultReceived(code = "auth-code", error = null))
             advanceUntilIdle()
 
             assertEquals(LoginUiState.LoggedIn, viewModel.uiState.value)
@@ -53,7 +66,7 @@ class LoginScreenViewModelTest {
         runTest {
             val viewModel = LoginScreenViewModel(mockk<AuthRepository>())
 
-            viewModel.onAuthorizationResult(code = null, error = "access_denied")
+            viewModel.onAction(LoginAction.AuthorizationResultReceived(code = null, error = "access_denied"))
 
             assertTrue(viewModel.uiState.value is LoginUiState.Error)
         }
@@ -63,7 +76,7 @@ class LoginScreenViewModelTest {
         runTest {
             val viewModel = LoginScreenViewModel(mockk<AuthRepository>())
 
-            viewModel.onAuthorizationResult(code = null, error = null)
+            viewModel.onAction(LoginAction.AuthorizationResultReceived(code = null, error = null))
 
             assertTrue(viewModel.uiState.value is LoginUiState.Error)
         }
@@ -72,9 +85,9 @@ class LoginScreenViewModelTest {
     fun onRetry_resetsToIdle() =
         runTest {
             val viewModel = LoginScreenViewModel(mockk<AuthRepository>())
-            viewModel.onAuthorizationResult(code = null, error = "access_denied")
+            viewModel.onAction(LoginAction.AuthorizationResultReceived(code = null, error = "access_denied"))
 
-            viewModel.onRetry()
+            viewModel.onAction(LoginAction.RetryClicked)
 
             assertEquals(LoginUiState.Idle, viewModel.uiState.value)
         }

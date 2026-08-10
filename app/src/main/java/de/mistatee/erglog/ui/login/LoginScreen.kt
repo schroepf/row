@@ -1,7 +1,6 @@
 package de.mistatee.erglog.ui.login
 
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -13,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.mistatee.erglog.data.auth.AuthRedirectHolder
 import org.koin.androidx.compose.koinViewModel
@@ -28,10 +28,21 @@ fun LoginScreen(
 
     LaunchedEffect(Unit) {
         AuthRedirectHolder.redirectUris.collect { uri ->
-            viewModel.onAuthorizationResult(
-                code = uri.getQueryParameter("code"),
-                error = uri.getQueryParameter("error"),
+            viewModel.onAction(
+                LoginAction.AuthorizationResultReceived(
+                    code = uri.getQueryParameter("code"),
+                    error = uri.getQueryParameter("error"),
+                ),
             )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                is LoginEffect.OpenAuthorizationTab ->
+                    CustomTabsIntent.Builder().build().launchUrl(context, effect.url.toUri())
+            }
         }
     }
 
@@ -46,12 +57,7 @@ fun LoginScreen(
     ) {
         when (val currentState = state) {
             LoginUiState.Idle -> {
-                Button(onClick = {
-                    CustomTabsIntent
-                        .Builder()
-                        .build()
-                        .launchUrl(context, viewModel.authorizationUrl.toUri())
-                }) {
+                Button(onClick = { viewModel.onAction(LoginAction.LoginClicked) }) {
                     Text("Log in with Concept2")
                 }
             }
@@ -62,7 +68,7 @@ fun LoginScreen(
 
             is LoginUiState.Error -> {
                 Text(currentState.message)
-                Button(onClick = viewModel::onRetry) {
+                Button(onClick = { viewModel.onAction(LoginAction.RetryClicked) }) {
                     Text("Retry")
                 }
             }
