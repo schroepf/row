@@ -93,13 +93,13 @@ private class FakeAuthApi(
 private class FakeSessionStore : SessionStore {
     private var session: Session? = null
 
-    override fun getSession(): Session? = session
+    override suspend fun getSession(): Session? = session
 
-    override fun saveSession(session: Session) {
+    override suspend fun saveSession(session: Session) {
         this.session = session
     }
 
-    override fun clearSession() {
+    override suspend fun clearSession() {
         session = null
     }
 }

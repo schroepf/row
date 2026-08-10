@@ -129,7 +129,8 @@ dependencies {
 
     // OAuth login: Custom Tabs + encrypted token storage
     implementation(libs.androidx.browser)
-    implementation(libs.androidx.security.crypto)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.tink.android)
 
     // java.time.Instant support on minSdk 24
     coreLibraryDesugaring(libs.android.desugar.jdk.libs)
