@@ -22,10 +22,10 @@
         "mcps": []
       },
       "librarian": {
-        "model": "opencode/deepseek-v4-flash"
+        "model": "opencode/deepseek-v4-flash-free"
       },
       "explorer": {
-        "model": "opencode/deepseek-v4-flash"
+        "model": "opencode/deepseek-v4-flash-free"
       },
       "designer": {
         "model": "opencode/gpt-5.6-luna",
@@ -36,7 +36,7 @@
         "mcps": []
       },
       "fixer": {
-        "model": "opencode/deepseek-v4-flash",
+        "model": "opencode/deepseek-v4-flash-free",
         "variant": "medium",
         "skills": [],
         "mcps": []
