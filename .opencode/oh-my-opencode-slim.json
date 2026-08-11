@@ -1,0 +1,46 @@
+{
+  "preset": "zen",
+  "presets": {
+    "zen": {
+      "orchestrator": {
+        "model": "opencode/claude-sonnet-5",
+        "variant": "medium",
+        "skills": [
+          "*"
+        ],
+        "mcps": [
+          "*",
+          "!gh_grep"
+        ]
+      },
+      "oracle": {
+        "model": "opencode/claude-fable-5",
+        "variant": "high",
+        "skills": [
+          "simplify"
+        ],
+        "mcps": []
+      },
+      "librarian": {
+        "model": "opencode/deepseek-v4-flash"
+      },
+      "explorer": {
+        "model": "opencode/deepseek-v4-flash"
+      },
+      "designer": {
+        "model": "opencode/gpt-5.6-luna",
+        "variant": "medium",
+        "skills": [
+          "agent-browser"
+        ],
+        "mcps": []
+      },
+      "fixer": {
+        "model": "opencode/deepseek-v4-flash",
+        "variant": "medium",
+        "skills": [],
+        "mcps": []
+      }
+    }
+  }
+}
