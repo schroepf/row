@@ -1,6 +1,6 @@
 # ErgLog
 
-ErgLog is an Android app for viewing rowing/ergometer workout history from a user's Concept2 Logbook account.
+ErgLog is an Android app for viewing rowing/ergometer result history from a user's Concept2 Logbook account.
 
 ## Language
 
@@ -38,4 +38,16 @@ _Avoid_: User, Account Details
 
 **Valid Session**:
 A [Session](#session) whose Access Token is confirmed usable right now — either still fresh, or freshly refreshed. Distinct from merely having *a* Session on record, which may hold a stale Access Token.
+
+**Result**:
+A single logged exercise session (row, ski, bike, etc.) as returned by Concept2's `/api/users/{user}/results` endpoint. Named to match the API's own vocabulary (`results`, `results:read`). This deliberately collides textually with Kotlin's `Result<T>` outcome type — e.g. `ResultRepository.fetchPage(): Result<ResultPage>` — a tradeoff accepted in favor of aligning with the API's terms; previously this was named "Workout" specifically to avoid that collision.
+_Avoid_: Workout, Entry, Session (see [Session](#session), a different concept)
+
+**Result History**:
+The Logbook Account holder's full paginated collection of Results, fetched a page at a time from `/api/users/{user}/results`.
+_Avoid_: Workout History, Workout Log, Feed
+
+**Load Next Page**:
+The action of fetching the next page of a [Result History](#result-history) from `/api/users/{user}/results`, triggered when the Logbook Account holder scrolls to the last currently-loaded Result. Determined possible by comparing the API's `current_page` against `total_pages`, not by the presence of a `links.next` URL.
+_Avoid_: Load More, Infinite Scroll
 </content>

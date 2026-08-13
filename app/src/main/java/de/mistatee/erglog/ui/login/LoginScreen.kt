@@ -3,6 +3,7 @@ package de.mistatee.erglog.ui.login
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -14,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.mistatee.erglog.data.auth.AuthRedirectHolder
+import de.mistatee.erglog.data.concept2.auth.model.AuthRedirectHolder
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -50,14 +51,27 @@ fun LoginScreen(
         if (state is LoginUiState.LoggedIn) onLoginSuccess()
     }
 
-    Column(
+    LoginScreen(
+        state = state,
+        onAction = viewModel::onAction,
         modifier = modifier,
+    )
+}
+
+@Composable
+internal fun LoginScreen(
+    state: LoginUiState,
+    onAction: (LoginAction) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        when (val currentState = state) {
+        when (state) {
             LoginUiState.Idle -> {
-                Button(onClick = { viewModel.onAction(LoginAction.LoginClicked) }) {
+                Button(onClick = { onAction(LoginAction.LoginClicked) }) {
                     Text("Log in with Concept2")
                 }
             }
@@ -67,8 +81,8 @@ fun LoginScreen(
             }
 
             is LoginUiState.Error -> {
-                Text(currentState.message)
-                Button(onClick = { viewModel.onAction(LoginAction.RetryClicked) }) {
+                Text(state.message)
+                Button(onClick = { onAction(LoginAction.RetryClicked) }) {
                     Text("Retry")
                 }
             }

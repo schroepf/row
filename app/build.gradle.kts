@@ -103,8 +103,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.android)
@@ -122,6 +125,8 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.androidx.paging.testing)
+    testImplementation(libs.ktor.client.mock)
 
     // Instrumented tests
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

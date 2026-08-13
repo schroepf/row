@@ -4,6 +4,7 @@ end_of_line = lf
 indent_size = 4
 indent_style = space
 tab_width = 4
+trim_trailing_whitespace = true
 ij_continuation_indent_size = 8
 ij_formatter_off_tag = @formatter:off
 ij_formatter_on_tag = @formatter:on
@@ -15,6 +16,8 @@ ij_wrap_on_typing = false
 [*.kt]
 max_line_length = 120
 insert_final_newline = true
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
 
 [*.json]
 indent_size = 2

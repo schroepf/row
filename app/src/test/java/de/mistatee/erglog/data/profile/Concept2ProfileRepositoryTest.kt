@@ -1,69 +1,78 @@
 package de.mistatee.erglog.data.profile
 
-import de.mistatee.erglog.data.auth.AuthRepository
-import de.mistatee.erglog.data.auth.Session
-import de.mistatee.erglog.data.auth.SessionError
+import de.mistatee.erglog.common.MockData
+import de.mistatee.erglog.data.concept2.auth.model.SessionError
+import de.mistatee.erglog.data.concept2.logbook.profile.Concept2ProfileRepository
+import de.mistatee.erglog.data.concept2.logbook.profile.model.ProfileException
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.Instant
 
 class Concept2ProfileRepositoryTest {
     @Test
-    fun fetchProfile_onSuccess_returnsProfile() =
-        runTest {
-            val authRepository = mockk<AuthRepository>()
-            coEvery { authRepository.validSession() } returns Result.success(SAMPLE_SESSION)
-            val profileApi = mockk<ProfileApi>()
-            coEvery { profileApi.fetchProfile(SAMPLE_SESSION.accessToken) } returns SAMPLE_PROFILE
-            val repository = Concept2ProfileRepository(authRepository, profileApi)
+    fun `fetchProfile returns profile on success`() = runTest {
+        // given
+        val session = MockData.Auth.session
+        val profile = MockData.Api.Profile.profile
 
-            val result = repository.fetchProfile()
+        val repository = Concept2ProfileRepository(
+            authRepository = mockk {
+                coEvery { validSession() } returns Result.success(session)
+            },
+            profileApi = mockk {
+                coEvery { fetchProfile(session.accessToken) } returns profile
+            },
+        )
 
-            assertTrue(result.isSuccess)
-            assertEquals(SAMPLE_PROFILE, result.getOrNull())
-        }
+        // when
+        val result = repository.fetchProfile()
 
-    @Test
-    fun fetchProfile_whenNoValidSession_propagatesFailure() =
-        runTest {
-            val authRepository = mockk<AuthRepository>()
-            coEvery { authRepository.validSession() } returns Result.failure(SessionError.NoSession)
-            val profileApi = mockk<ProfileApi>()
-            val repository = Concept2ProfileRepository(authRepository, profileApi)
-
-            val result = repository.fetchProfile()
-
-            assertTrue(result.isFailure)
-            assertTrue(result.exceptionOrNull() is SessionError.NoSession)
-        }
+        // then
+        assertTrue(result.isSuccess)
+        assertEquals(profile, result.getOrNull())
+    }
 
     @Test
-    fun fetchProfile_whenApiThrows_propagatesFailure() =
-        runTest {
-            val apiFailure = ProfileException("http_500", null)
-            val authRepository = mockk<AuthRepository>()
-            coEvery { authRepository.validSession() } returns Result.success(SAMPLE_SESSION)
-            val profileApi = mockk<ProfileApi>()
-            coEvery { profileApi.fetchProfile(SAMPLE_SESSION.accessToken) } throws apiFailure
-            val repository = Concept2ProfileRepository(authRepository, profileApi)
+    fun `fetchProfile returns failure on missing session`() = runTest {
+        // given
+        val repository = Concept2ProfileRepository(
+            authRepository = mockk {
+                coEvery { validSession() } returns Result.failure(SessionError.NoSession)
+            },
+            profileApi = mockk(),
+        )
 
-            val result = repository.fetchProfile()
+        // when
+        val result = repository.fetchProfile()
 
-            assertTrue(result.isFailure)
-            assertEquals(apiFailure, result.exceptionOrNull())
-        }
+        // then
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is SessionError.NoSession)
+    }
 
-    private companion object {
-        val SAMPLE_SESSION =
-            Session(
-                accessToken = "access-token",
-                refreshToken = "refresh-token",
-                accessTokenExpiry = Instant.now().plusSeconds(3600),
-            )
-        val SAMPLE_PROFILE = Profile(username = "rower1")
+    @Test
+    fun `fetchProfile returns failure when API throws`() = runTest {
+        // given
+        val session = MockData.Auth.session
+        val apiFailure = ProfileException("http_500", null)
+
+        val repository = Concept2ProfileRepository(
+            authRepository = mockk {
+                coEvery { validSession() } returns Result.success(session)
+            },
+            profileApi = mockk {
+                coEvery { fetchProfile(session.accessToken) } throws apiFailure
+            },
+        )
+
+        // when
+        val result = repository.fetchProfile()
+
+        // then
+        assertTrue(result.isFailure)
+        assertEquals(apiFailure, result.exceptionOrNull())
     }
 }

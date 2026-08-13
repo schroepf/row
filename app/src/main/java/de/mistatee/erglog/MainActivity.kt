@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import de.mistatee.erglog.data.auth.AuthRedirectHolder
+import de.mistatee.erglog.data.concept2.auth.model.AuthRedirectHolder
 import de.mistatee.erglog.theme.ErgLogTheme
 
 class MainActivity : ComponentActivity() {

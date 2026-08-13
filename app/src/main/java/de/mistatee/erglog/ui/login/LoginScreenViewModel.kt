@@ -2,8 +2,7 @@ package de.mistatee.erglog.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.mistatee.erglog.data.auth.AuthRepository
-import de.mistatee.erglog.data.auth.buildAuthorizationUrl
+import de.mistatee.erglog.data.concept2.auth.AuthRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,14 +17,13 @@ class LoginScreenViewModel(private val authRepository: AuthRepository) : ViewMod
     private val effectChannel = Channel<LoginEffect>(Channel.BUFFERED)
     val effects: Flow<LoginEffect> = effectChannel.receiveAsFlow()
 
-    private val authorizationUrl: String = buildAuthorizationUrl()
-
     fun onAction(action: LoginAction) {
         when (action) {
             LoginAction.LoginClicked ->
                 viewModelScope.launch {
-                    effectChannel.send(LoginEffect.OpenAuthorizationTab(authorizationUrl))
+                    effectChannel.send(LoginEffect.OpenAuthorizationTab(authRepository.authorizationUrl))
                 }
+
             is LoginAction.AuthorizationResultReceived -> onAuthorizationResult(action.code, action.error)
             LoginAction.RetryClicked -> uiState.value = LoginUiState.Idle
         }

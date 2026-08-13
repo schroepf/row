@@ -9,7 +9,7 @@ import org.koin.test.verify.verify
 class AppModuleTest {
     @OptIn(KoinExperimentalAPI::class)
     @Test
-    fun appModule_verifiesSuccessfully() {
+    fun `appModule verifies successfully`() {
         appModule.verify(extraTypes = listOf(Context::class, HttpClientEngine::class))
     }
 }

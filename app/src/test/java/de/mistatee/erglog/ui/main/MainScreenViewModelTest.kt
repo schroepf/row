@@ -1,67 +1,86 @@
 package de.mistatee.erglog.ui.main
 
-import de.mistatee.erglog.data.profile.Profile
-import de.mistatee.erglog.data.profile.ProfileRepository
+import de.mistatee.erglog.common.CoroutineTestRule
+import de.mistatee.erglog.data.concept2.logbook.profile.model.Profile
 import io.mockk.coEvery
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainScreenViewModelTest {
-    private val testDispatcher = StandardTestDispatcher()
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
 
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(testDispatcher)
+    @Test
+    fun `uiState is initially Loading`() = runTest {
+        // Given
+        val viewModel = MainScreenViewModel(
+            profileRepository = mockk {
+                coEvery { fetchProfile() } coAnswers { awaitCancellation() }
+            },
+            resultRepository = mockk {
+                coEvery { fetchPage(any(), any()) } coAnswers { awaitCancellation() }
+            },
+        )
+
+        // When
+        val initialUiState = viewModel.uiState.value
+
+        // Then
+        assertEquals(
+            MainScreenUiState.Loading,
+            initialUiState,
+        )
     }
 
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
+    @Test
+    fun `uiState has correct username on success`() = runTest {
+        // Given
+        val username = "Sample"
+        val viewModel = MainScreenViewModel(
+            profileRepository = mockk {
+                coEvery { fetchProfile() } returns Result.success(Profile(username = username))
+            },
+            resultRepository = mockk {
+                coEvery { fetchPage(any(), any()) } coAnswers { awaitCancellation() }
+            },
+        )
+
+        // When
+        advanceUntilIdle()
+        val uiState = viewModel.uiState.value
+
+        // Then
+        assertEquals(
+            MainScreenUiState.Success(username = username),
+            uiState,
+        )
     }
 
     @Test
-    fun uiState_initiallyLoading() =
-        runTest(testDispatcher) {
-            val profileRepository = mockk<ProfileRepository>()
-            coEvery { profileRepository.fetchProfile() } coAnswers { awaitCancellation() }
-            val viewModel = MainScreenViewModel(profileRepository)
-            assertEquals(MainScreenUiState.Loading, viewModel.uiState.value)
-        }
+    fun `uiState propagates profile error`() = runTest {
+        // Given
+        val exception = IllegalStateException("boom")
+        val viewModel = MainScreenViewModel(
+            profileRepository = mockk {
+                coEvery { fetchProfile() } returns Result.failure(exception)
+            },
+            resultRepository = mockk {
+                coEvery { fetchPage(any(), any()) } coAnswers { awaitCancellation() }
+            },
+        )
 
-    @Test
-    fun uiState_onFetchSuccess_isDisplayed() =
-        runTest(testDispatcher) {
-            val profileRepository = mockk<ProfileRepository>()
-            coEvery { profileRepository.fetchProfile() } returns Result.success(Profile(username = "Sample"))
-            val viewModel = MainScreenViewModel(profileRepository)
+        // When
+        advanceUntilIdle()
+        val uiState = viewModel.uiState.value
 
-            advanceUntilIdle()
-
-            assertEquals(MainScreenUiState.Success("Sample"), viewModel.uiState.value)
-        }
-
-    @Test
-    fun uiState_onFetchFailure_showsError() =
-        runTest(testDispatcher) {
-            val failure = IllegalStateException("boom")
-            val profileRepository = mockk<ProfileRepository>()
-            coEvery { profileRepository.fetchProfile() } returns Result.failure(failure)
-            val viewModel = MainScreenViewModel(profileRepository)
-
-            advanceUntilIdle()
-
-            assertEquals(MainScreenUiState.Error(failure), viewModel.uiState.value)
-        }
+        // Then
+        assertEquals(MainScreenUiState.Error(exception), uiState)
+    }
 }
