@@ -3,12 +3,13 @@ package de.mistatee.erglog.data.concept2.logbook.results
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNull
 import de.mistatee.erglog.common.MockData
 import de.mistatee.erglog.data.concept2.logbook.results.model.ResultPage
 import io.mockk.coEvery
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -35,8 +36,8 @@ class ResultPagingSourceTest {
             val result = pager.refresh() as PagingSource.LoadResult.Page
 
             // Then
-            assertEquals(results, result.data)
-            assertEquals(2, result.nextKey)
+            assertThat(result.data).isEqualTo(results)
+            assertThat(result.nextKey).isEqualTo(2)
         }
 
     @Test
@@ -64,8 +65,8 @@ class ResultPagingSourceTest {
             val result = pager.append() as PagingSource.LoadResult.Page
 
             // Then
-            assertEquals(secondPageResults, result.data)
-            assertEquals(null, result.nextKey)
+            assertThat(result.data).isEqualTo(secondPageResults)
+            assertThat(result.nextKey).isNull()
         }
 
     @Test
@@ -83,11 +84,10 @@ class ResultPagingSourceTest {
             )
 
             // When
-            val result = pager.refresh()
+            val result = pager.refresh() as PagingSource.LoadResult.Error
 
             // Then
-            assertTrue(result is PagingSource.LoadResult.Error)
-            assertEquals(exception, (result as PagingSource.LoadResult.Error).throwable)
+            assertThat(result.throwable).isEqualTo(exception)
         }
 
     @Test
@@ -109,6 +109,6 @@ class ResultPagingSourceTest {
             val result = pager.refresh() as PagingSource.LoadResult.Page
 
             // Then
-            assertEquals(null, result.nextKey)
+            assertThat(result.nextKey).isEqualTo(null)
         }
 }

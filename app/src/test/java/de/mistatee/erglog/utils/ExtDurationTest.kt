@@ -1,6 +1,7 @@
 package de.mistatee.erglog.utils
 
-import org.junit.Assert.assertEquals
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import org.junit.Test
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -16,7 +17,7 @@ class ExtDurationTest {
         val formatted = duration.formatResultDuration()
 
         // then
-        assertEquals("0:45", formatted)
+        assertThat(formatted).isEqualTo("0:45")
     }
 
     @Test
@@ -28,7 +29,7 @@ class ExtDurationTest {
         val formatted = duration.formatResultDuration()
 
         // then
-        assertEquals("13:55", formatted)
+        assertThat(formatted).isEqualTo("13:55")
     }
 
     @Test
@@ -40,7 +41,7 @@ class ExtDurationTest {
         val formatted = duration.formatResultDuration()
 
         // then
-        assertEquals("4:13:55", formatted)
+        assertThat(formatted).isEqualTo("4:13:55")
     }
 
     @Test
@@ -52,7 +53,7 @@ class ExtDurationTest {
         val formatted = duration.formatResultDuration()
 
         // then
-        assertEquals("1:02:03", formatted)
+        assertThat(formatted).isEqualTo("1:02:03")
     }
 
     @Test
@@ -64,6 +65,6 @@ class ExtDurationTest {
         val formatted = duration.formatResultDuration()
 
         // then
-        assertEquals("0:00", formatted)
+        assertThat(formatted).isEqualTo("0:00")
     }
 }

@@ -1,10 +1,11 @@
 package de.mistatee.erglog.ui.main
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import de.mistatee.erglog.common.CoroutineTestRule
 import de.mistatee.erglog.data.concept2.logbook.profile.model.Profile
 import io.mockk.coEvery
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -33,10 +34,7 @@ class MainScreenViewModelTest {
         val initialUiState = viewModel.uiState.value
 
         // Then
-        assertEquals(
-            MainScreenUiState.Loading,
-            initialUiState,
-        )
+        assertThat(initialUiState).isEqualTo(MainScreenUiState.Loading)
     }
 
     @Test
@@ -57,10 +55,7 @@ class MainScreenViewModelTest {
         val uiState = viewModel.uiState.value
 
         // Then
-        assertEquals(
-            MainScreenUiState.Success(username = username),
-            uiState,
-        )
+        assertThat(uiState).isEqualTo(MainScreenUiState.Success(username = username))
     }
 
     @Test
@@ -81,6 +76,6 @@ class MainScreenViewModelTest {
         val uiState = viewModel.uiState.value
 
         // Then
-        assertEquals(MainScreenUiState.Error(exception), uiState)
+        assertThat(uiState).isEqualTo(MainScreenUiState.Error(exception))
     }
 }

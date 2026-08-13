@@ -1,5 +1,9 @@
 package de.mistatee.erglog.data.results
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import de.mistatee.erglog.common.MockData
 import de.mistatee.erglog.data.concept2.logbook.results.model.MetaResponse
 import de.mistatee.erglog.data.concept2.logbook.results.model.PaginationResponse
@@ -12,9 +16,6 @@ import de.mistatee.erglog.data.concept2.logbook.results.model.toResultPage
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -30,7 +31,7 @@ class ResultMappingTest {
         val duration = tenthsOfASecondToDuration(timeTenths)
 
         // then
-        assertEquals(4.hours + 13.minutes + 55.seconds, duration)
+        assertThat(duration).isEqualTo(4.hours + 13.minutes + 55.seconds)
     }
 
     @Test
@@ -43,7 +44,7 @@ class ResultMappingTest {
 
         // then
         val expected = LocalDateTime(2013, 6, 21, 0, 0, 0).toInstant(TimeZone.currentSystemDefault())
-        assertEquals(expected, instant)
+        assertThat(instant).isEqualTo(expected)
     }
 
     @Test
@@ -79,18 +80,17 @@ class ResultMappingTest {
         val page = response.toResultPage()
 
         // then
-        assertEquals(mockResults.size, page.results.size)
+        assertThat(page.results.size).isEqualTo(mockResults.size)
         val first = page.results[0]
-        assertEquals(mockResults[0].id, first.id)
-        assertEquals(mockResults[0].type, first.type)
-        assertEquals(mockResults[0].distance, first.distance)
-        assertEquals(4.hours + 13.minutes + 55.seconds, first.duration)
-        assertEquals(
+        assertThat(first.id).isEqualTo(mockResults[0].id)
+        assertThat(first.type).isEqualTo(mockResults[0].type)
+        assertThat(first.distance).isEqualTo(mockResults[0].distance)
+        assertThat(first.duration).isEqualTo(4.hours + 13.minutes + 55.seconds)
+        assertThat(first.date).isEqualTo(
             LocalDateTime(2013, 6, 21, 0, 0, 0).toInstant(TimeZone.currentSystemDefault()),
-            first.date,
         )
-        assertEquals(1, page.currentPage)
-        assertEquals(1, page.totalPages)
+        assertThat(page.currentPage).isEqualTo(1)
+        assertThat(page.totalPages).isEqualTo(1)
     }
 
     @Test
@@ -102,7 +102,7 @@ class ResultMappingTest {
         val hasNextPage = page.hasNextPage
 
         // then
-        assertTrue(hasNextPage)
+        assertThat(hasNextPage).isTrue()
     }
 
     @Test
@@ -114,6 +114,6 @@ class ResultMappingTest {
         val hasNextPage = page.hasNextPage
 
         // then
-        assertFalse(hasNextPage)
+        assertThat(hasNextPage).isFalse()
     }
 }

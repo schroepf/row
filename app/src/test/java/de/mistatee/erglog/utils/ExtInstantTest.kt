@@ -1,9 +1,10 @@
 package de.mistatee.erglog.utils
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ExtInstantTest {
@@ -16,6 +17,6 @@ class ExtInstantTest {
         val formatted = instant.formatResultDate()
 
         // then
-        assertEquals("June 21, 2013", formatted)
+        assertThat(formatted).isEqualTo("June 21, 2013")
     }
 }

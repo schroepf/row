@@ -1,5 +1,10 @@
 package de.mistatee.erglog.data.profile
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import de.mistatee.erglog.common.MockData
 import de.mistatee.erglog.data.concept2.auth.model.SessionError
 import de.mistatee.erglog.data.concept2.logbook.profile.Concept2ProfileRepository
@@ -7,8 +12,6 @@ import de.mistatee.erglog.data.concept2.logbook.profile.model.ProfileException
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class Concept2ProfileRepositoryTest {
@@ -31,8 +34,8 @@ class Concept2ProfileRepositoryTest {
         val result = repository.fetchProfile()
 
         // then
-        assertTrue(result.isSuccess)
-        assertEquals(profile, result.getOrNull())
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEqualTo(profile)
     }
 
     @Test
@@ -49,8 +52,8 @@ class Concept2ProfileRepositoryTest {
         val result = repository.fetchProfile()
 
         // then
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is SessionError.NoSession)
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isNotNull().isInstanceOf<SessionError.NoSession>()
     }
 
     @Test
@@ -72,7 +75,7 @@ class Concept2ProfileRepositoryTest {
         val result = repository.fetchProfile()
 
         // then
-        assertTrue(result.isFailure)
-        assertEquals(apiFailure, result.exceptionOrNull())
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(apiFailure)
     }
 }

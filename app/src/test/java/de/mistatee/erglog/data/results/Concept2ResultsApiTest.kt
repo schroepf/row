@@ -1,5 +1,11 @@
 package de.mistatee.erglog.data.results
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import de.mistatee.erglog.common.MockData
 import de.mistatee.erglog.data.concept2.logbook.results.api.Concept2ResultsApi
 import de.mistatee.erglog.data.concept2.logbook.results.model.ResultsApiException
@@ -13,9 +19,6 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class Concept2ResultsApiTest {
@@ -44,9 +47,9 @@ class Concept2ResultsApiTest {
 
             // then
             val url = requireNotNull(capturedUrl)
-            assertEquals("Bearer access-token", capturedAuthHeader)
-            assertTrue(url.contains("page=$page"))
-            assertTrue(url.contains("per_page=$pageSize"))
+            assertThat(capturedAuthHeader).isEqualTo("Bearer access-token")
+            assertThat(url.contains("page=$page")).isTrue()
+            assertThat(url.contains("per_page=$pageSize")).isTrue()
         }
 
     @Test
@@ -66,11 +69,11 @@ class Concept2ResultsApiTest {
             val resultPage = api.fetchResults(accessToken = "access-token", page = 1, pageSize = 20)
 
             // then
-            assertEquals(1, resultPage.results.size)
-            assertEquals(3L, resultPage.results[0].id)
-            assertEquals(1, resultPage.currentPage)
-            assertEquals(1, resultPage.totalPages)
-            assertFalse(resultPage.hasNextPage)
+            assertThat(resultPage.results.size).isEqualTo(1)
+            assertThat(resultPage.results[0].id).isEqualTo(3L)
+            assertThat(resultPage.currentPage).isEqualTo(1)
+            assertThat(resultPage.totalPages).isEqualTo(1)
+            assertThat(resultPage.hasNextPage).isFalse()
         }
 
     @Test
@@ -90,8 +93,8 @@ class Concept2ResultsApiTest {
                 .exceptionOrNull()
 
             // then
-            assertTrue(exception is ResultsApiException)
-            assertEquals("http_500", (exception as ResultsApiException).error)
+            assertThat(exception).isNotNull().isInstanceOf<ResultsApiException>()
+            assertThat((exception as ResultsApiException).error).isEqualTo("http_500")
         }
 }
 

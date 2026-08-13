@@ -42,7 +42,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
@@ -120,13 +123,14 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // Unit tests
+    testImplementation(libs.androidx.paging.testing)
+    testImplementation(libs.assertk)
     testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockk)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
-    testImplementation(libs.androidx.paging.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.mockk)
 
     // Instrumented tests
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

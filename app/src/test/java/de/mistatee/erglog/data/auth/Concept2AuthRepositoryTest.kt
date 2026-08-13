@@ -1,5 +1,10 @@
 package de.mistatee.erglog.data.auth
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import de.mistatee.erglog.common.MockData
 import de.mistatee.erglog.data.concept2.auth.Concept2AuthRepository
 import de.mistatee.erglog.data.concept2.auth.api.AuthApi
@@ -13,8 +18,6 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 
@@ -41,12 +44,12 @@ class Concept2AuthRepositoryTest {
         val result = repository.completeLogin(authCode)
 
         // then
-        assertTrue(result.isSuccess)
+        assertThat(result.isSuccess).isTrue()
         coVerify {
             sessionStore.saveSession(
                 withArg {
-                    assertEquals(tokenResponse.accessToken, it.accessToken)
-                    assertEquals(tokenResponse.refreshToken, it.refreshToken)
+                    assertThat(it.accessToken).isEqualTo(tokenResponse.accessToken)
+                    assertThat(it.refreshToken).isEqualTo(tokenResponse.refreshToken)
                 },
             )
         }
@@ -70,7 +73,7 @@ class Concept2AuthRepositoryTest {
         val result = repository.completeLogin(authCode)
 
         // Then
-        assertTrue(result.isFailure)
+        assertThat(result.isFailure).isTrue()
         coVerify(exactly = 0) { sessionStore.saveSession(any()) }
     }
 
@@ -94,7 +97,7 @@ class Concept2AuthRepositoryTest {
         val result = repository.refreshSession()
 
         // Then
-        assertTrue(result.isFailure)
+        assertThat(result.isFailure).isTrue()
         coVerify(exactly = 1) { sessionStore.clearSession() }
     }
 
@@ -113,7 +116,7 @@ class Concept2AuthRepositoryTest {
         )
 
         // Then
-        assertEquals(session, repository.currentSession())
+        assertThat(repository.currentSession()).isEqualTo(session)
     }
 
     @Test
@@ -133,8 +136,8 @@ class Concept2AuthRepositoryTest {
         val result = repository.validSession()
 
         // Then
-        assertTrue(result.isSuccess)
-        assertEquals(freshSession, result.getOrNull())
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEqualTo(freshSession)
         coVerify(exactly = 0) { authApi.refreshAccessToken(any()) }
     }
 
@@ -160,8 +163,8 @@ class Concept2AuthRepositoryTest {
         val result = repository.validSession()
 
         // Then
-        assertTrue(result.isSuccess)
-        assertEquals(tokenResponse.accessToken, result.getOrNull()?.accessToken)
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()?.accessToken).isEqualTo(tokenResponse.accessToken)
     }
 
     @Test
@@ -179,8 +182,8 @@ class Concept2AuthRepositoryTest {
         val result = repository.validSession()
 
         // Then
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is SessionError.NoSession)
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isNotNull().isInstanceOf<SessionError.NoSession>()
     }
 
     @Test
@@ -204,9 +207,9 @@ class Concept2AuthRepositoryTest {
         val result = repository.validSession()
 
         // Then
-        assertTrue(result.isFailure)
+        assertThat(result.isFailure).isTrue()
         val error = result.exceptionOrNull()
-        assertTrue(error is SessionError.RefreshFailed)
-        assertEquals(cause, error?.cause)
+        assertThat(error).isNotNull().isInstanceOf<SessionError.RefreshFailed>()
+        assertThat(error?.cause).isEqualTo(cause)
     }
 }

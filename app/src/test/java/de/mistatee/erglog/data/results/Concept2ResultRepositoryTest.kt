@@ -1,5 +1,10 @@
 package de.mistatee.erglog.data.results
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import de.mistatee.erglog.common.MockData
 import de.mistatee.erglog.data.concept2.auth.model.SessionError
 import de.mistatee.erglog.data.concept2.logbook.results.Concept2ResultRepository
@@ -8,8 +13,6 @@ import de.mistatee.erglog.data.concept2.logbook.results.model.ResultsApiExceptio
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class Concept2ResultRepositoryTest {
@@ -41,8 +44,8 @@ class Concept2ResultRepositoryTest {
             val result = repository.fetchPage(page = page, pageSize = pageSize)
 
             // then
-            assertTrue(result.isSuccess)
-            assertEquals(resultsPage, result.getOrNull())
+            assertThat(result.isSuccess).isTrue()
+            assertThat(result.getOrNull()).isEqualTo(resultsPage)
         }
 
     @Test
@@ -60,8 +63,8 @@ class Concept2ResultRepositoryTest {
             val result = repository.fetchPage(page = 1, pageSize = 20)
 
             // then
-            assertTrue(result.isFailure)
-            assertTrue(result.exceptionOrNull() is SessionError.NoSession)
+            assertThat(result.isFailure).isTrue()
+            assertThat(result.exceptionOrNull()).isNotNull().isInstanceOf<SessionError.NoSession>()
         }
 
     @Test
@@ -86,7 +89,7 @@ class Concept2ResultRepositoryTest {
             val result = repository.fetchPage(page = page, pageSize = pageSize)
 
             // then
-            assertTrue(result.isFailure)
-            assertEquals(apiFailure, result.exceptionOrNull())
+            assertThat(result.isFailure).isTrue()
+            assertThat(result.exceptionOrNull()).isEqualTo(apiFailure)
         }
 }
