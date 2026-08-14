@@ -4,8 +4,8 @@ import androidx.paging.PagingData
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import de.mistatee.erglog.common.CoroutineTestRule
-import de.mistatee.erglog.data.concept2.logbook.profile.model.Profile
-import de.mistatee.erglog.data.concept2.logbook.results.ResultRepository
+import de.mistatee.erglog.data.model.Profile
+import de.mistatee.erglog.data.repository.ResultRepository
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

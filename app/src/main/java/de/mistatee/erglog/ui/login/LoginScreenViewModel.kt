@@ -2,7 +2,7 @@ package de.mistatee.erglog.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.mistatee.erglog.data.concept2.auth.AuthRepository
+import de.mistatee.erglog.data.repository.AuthRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

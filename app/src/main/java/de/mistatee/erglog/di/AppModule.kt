@@ -1,29 +1,29 @@
 package de.mistatee.erglog.di
 
-import de.mistatee.erglog.data.concept2.auth.api.AuthApi
-import de.mistatee.erglog.data.concept2.auth.AuthRepository
-import de.mistatee.erglog.data.concept2.auth.Concept2AuthRepository
-import de.mistatee.erglog.data.concept2.auth.store.EncryptedSessionStore
-import de.mistatee.erglog.data.concept2.auth.api.Concept2AuthApi
-import de.mistatee.erglog.data.concept2.auth.store.SessionStore
-import de.mistatee.erglog.data.concept2.logbook.profile.Concept2ProfileRepository
-import de.mistatee.erglog.data.concept2.logbook.profile.api.Concept2ProfileApi
-import de.mistatee.erglog.data.concept2.logbook.profile.api.ProfileApi
-import de.mistatee.erglog.data.defaultHttpClient
-import de.mistatee.erglog.data.concept2.logbook.profile.ProfileRepository
-import de.mistatee.erglog.data.concept2.logbook.results.Concept2ResultRepository
-import de.mistatee.erglog.data.concept2.logbook.results.api.Concept2ResultsApi
-import de.mistatee.erglog.data.concept2.logbook.results.ResultRepository
-import de.mistatee.erglog.data.concept2.logbook.results.api.ResultsApi
+import de.mistatee.erglog.data.local.EncryptedPreferencesStore
 import de.mistatee.erglog.data.local.ErgLogDatabase
 import de.mistatee.erglog.data.local.LocalCache
 import de.mistatee.erglog.data.local.LocalTransactionRunner
+import de.mistatee.erglog.data.local.PreferencesStore
 import de.mistatee.erglog.data.local.RoomLocalCache
 import de.mistatee.erglog.data.local.RoomTransactionRunner
-import de.mistatee.erglog.data.local.profile.ProfileDao
-import de.mistatee.erglog.data.local.results.ResultDao
-import de.mistatee.erglog.data.local.results.ResultRemoteMediator
-import de.mistatee.erglog.data.local.results.ResultSyncStateDao
+import de.mistatee.erglog.data.local.dao.ProfileDao
+import de.mistatee.erglog.data.local.dao.ResultDao
+import de.mistatee.erglog.data.local.dao.ResultSyncStateDao
+import de.mistatee.erglog.data.remote.auth.Concept2RemoteAuthDataSource
+import de.mistatee.erglog.data.remote.auth.RemoteAuthDataSource
+import de.mistatee.erglog.data.remote.defaultHttpClient
+import de.mistatee.erglog.data.remote.profile.Concept2RemoteProfileDataSource
+import de.mistatee.erglog.data.remote.profile.RemoteProfileDataSource
+import de.mistatee.erglog.data.remote.results.Concept2RemoteResultsDataSource
+import de.mistatee.erglog.data.remote.results.RemoteResultsDataSource
+import de.mistatee.erglog.data.repository.AuthRepository
+import de.mistatee.erglog.data.repository.Concept2AuthRepository
+import de.mistatee.erglog.data.repository.Concept2ProfileRepository
+import de.mistatee.erglog.data.repository.Concept2ResultRepository
+import de.mistatee.erglog.data.repository.ProfileRepository
+import de.mistatee.erglog.data.repository.ResultRemoteMediator
+import de.mistatee.erglog.data.repository.ResultRepository
 import de.mistatee.erglog.ui.login.LoginScreenViewModel
 import de.mistatee.erglog.ui.main.MainScreenViewModel
 import io.ktor.client.HttpClient
@@ -46,14 +46,14 @@ val appModule =
         single<ResultSyncStateDao> { get<ErgLogDatabase>().resultSyncStateDao() }
         single<ProfileDao> { get<ErgLogDatabase>().profileDao() }
 
-        single<AuthApi> { Concept2AuthApi(get()) }
-        single<SessionStore> { EncryptedSessionStore(androidContext()) }
+        single<RemoteAuthDataSource> { Concept2RemoteAuthDataSource(get()) }
+        single<PreferencesStore> { EncryptedPreferencesStore(androidContext()) }
         single<AuthRepository> { Concept2AuthRepository(get(), get(), get(), get()) }
 
-        single<ProfileApi> { Concept2ProfileApi(get()) }
+        single<RemoteProfileDataSource> { Concept2RemoteProfileDataSource(get()) }
         single<ProfileRepository> { Concept2ProfileRepository(get(), get(), get()) }
 
-        single<ResultsApi> { Concept2ResultsApi(get()) }
+        single<RemoteResultsDataSource> { Concept2RemoteResultsDataSource(get()) }
         single<ResultRemoteMediator> { ResultRemoteMediator(get(), get(), get(), get(), get()) }
         single<ResultRepository> { Concept2ResultRepository(get(), get()) }
 

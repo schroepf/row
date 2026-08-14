@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import de.mistatee.erglog.data.concept2.auth.AuthRepository
+import de.mistatee.erglog.data.repository.AuthRepository
 import de.mistatee.erglog.ui.login.LoginScreen
 import de.mistatee.erglog.ui.main.MainScreen
 import de.mistatee.erglog.ui.main.MainScreenViewModel
@@ -55,7 +55,7 @@ fun MainNavigation() {
                         viewModel = koinViewModel<MainScreenViewModel>(),
                         modifier = Modifier
                             .safeDrawingPadding()
-                            .padding(16.dp)
+                            .padding(16.dp),
                     )
                 }
             },

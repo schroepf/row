@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import de.mistatee.erglog.data.concept2.logbook.results.model.Result
+import de.mistatee.erglog.data.model.Result
 import de.mistatee.erglog.utils.formatResultDate
 import de.mistatee.erglog.utils.formatResultDuration
 import kotlinx.coroutines.flow.flowOf

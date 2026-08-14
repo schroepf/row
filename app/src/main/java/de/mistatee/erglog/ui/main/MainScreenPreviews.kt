@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import de.mistatee.erglog.data.concept2.logbook.results.model.Result
+import de.mistatee.erglog.data.model.Result
 import de.mistatee.erglog.theme.ErgLogTheme
 import de.mistatee.erglog.utils.asLazyPagingItems
 import de.mistatee.erglog.utils.asLazyPagingItemsWithError

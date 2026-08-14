@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.mistatee.erglog.data.concept2.auth.model.AuthRedirectHolder
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

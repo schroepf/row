@@ -1,10 +1,10 @@
 package de.mistatee.erglog.common
 
-import de.mistatee.erglog.data.concept2.auth.model.Session
-import de.mistatee.erglog.data.concept2.auth.model.TokenResponse
-import de.mistatee.erglog.data.concept2.logbook.profile.model.Profile
-import de.mistatee.erglog.data.concept2.logbook.results.model.Result
-import de.mistatee.erglog.data.concept2.logbook.results.model.ResultPage
+import de.mistatee.erglog.data.model.Profile
+import de.mistatee.erglog.data.model.Result
+import de.mistatee.erglog.data.model.ResultPage
+import de.mistatee.erglog.data.model.Session
+import de.mistatee.erglog.data.remote.auth.model.RemoteTokenResponse
 import io.mockk.every
 import io.mockk.mockk
 import kotlin.time.Duration.Companion.minutes
@@ -17,7 +17,7 @@ object MockData {
     }
 
     data object Auth {
-        val tokenResponse = TokenResponse(
+        val remoteTokenResponse = RemoteTokenResponse(
             accessToken = "response-access-token",
             tokenType = "Bearer",
             expiresIn = 604_800,

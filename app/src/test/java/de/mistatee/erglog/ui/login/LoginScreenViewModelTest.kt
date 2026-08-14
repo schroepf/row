@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import de.mistatee.erglog.common.CoroutineTestRule
-import de.mistatee.erglog.data.concept2.auth.AuthRepository
+import de.mistatee.erglog.data.repository.AuthRepository
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

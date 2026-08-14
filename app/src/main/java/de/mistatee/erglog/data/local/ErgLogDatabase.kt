@@ -5,12 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import de.mistatee.erglog.data.local.profile.ProfileDao
-import de.mistatee.erglog.data.local.profile.ProfileEntity
-import de.mistatee.erglog.data.local.results.ResultDao
-import de.mistatee.erglog.data.local.results.ResultEntity
-import de.mistatee.erglog.data.local.results.ResultSyncStateDao
-import de.mistatee.erglog.data.local.results.ResultSyncStateEntity
+import de.mistatee.erglog.data.local.dao.ProfileDao
+import de.mistatee.erglog.data.local.dao.ResultDao
+import de.mistatee.erglog.data.local.dao.ResultSyncStateDao
+import de.mistatee.erglog.data.local.entities.ProfileEntity
+import de.mistatee.erglog.data.local.entities.ResultEntity
+import de.mistatee.erglog.data.local.entities.ResultSyncStateEntity
 
 private const val DATABASE_NAME = "de.mistatee.erglog.database"
 

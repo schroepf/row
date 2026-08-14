@@ -5,7 +5,7 @@ import androidx.room.withTransaction
 
 /**
  * Runs a block of local-cache writes atomically. Exists as a seam so callers (e.g.
- * [de.mistatee.erglog.data.local.results.ResultRemoteMediator]) don't depend on a concrete
+ * [de.mistatee.erglog.data.repository.ResultRemoteMediator]) don't depend on a concrete
  * [RoomDatabase], keeping them mockable in tests.
  */
 interface LocalTransactionRunner {

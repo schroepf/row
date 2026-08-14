@@ -28,7 +28,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import de.mistatee.erglog.data.concept2.logbook.results.model.Result
+import de.mistatee.erglog.data.model.Result
 import de.mistatee.erglog.utils.formatResultDate
 import de.mistatee.erglog.utils.formatResultDuration
 
@@ -114,7 +114,7 @@ private fun ProfileHeader(username: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $username!",
         style = MaterialTheme.typography.headlineSmall,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -198,11 +198,13 @@ private fun ResultHistoryFooter(
             Box(
                 modifier
                     .fillMaxWidth()
-                    .padding(24.dp), contentAlignment = Alignment.Center
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(modifier = Modifier.size(32.dp))
             }
         }
+
         else -> {
             // Idle / end of pagination reached: nothing to show.
         }

@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import de.mistatee.erglog.data.concept2.logbook.profile.ProfileRepository
-import de.mistatee.erglog.data.concept2.logbook.results.ResultRepository
-import de.mistatee.erglog.data.concept2.logbook.results.model.Result
+import de.mistatee.erglog.data.model.Result
+import de.mistatee.erglog.data.repository.ProfileRepository
+import de.mistatee.erglog.data.repository.ResultRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
  * docs/adr/0005-room-for-offline-first-persistence.md): [uiState] and [resultsFlow] both observe
  * the cache directly. Refresh-on-launch happens once per ViewModel lifetime for Profile (via
  * [refresh], called from [init]) and once per [resultsFlow] Pager lifetime for Result History (via
- * [de.mistatee.erglog.data.local.results.ResultRemoteMediator.initialize]); pull-to-refresh in the
+ * [de.mistatee.erglog.data.repository.ResultRemoteMediator.initialize]); pull-to-refresh in the
  * UI re-triggers both by calling [refresh] and the paging items' own `refresh()`.
  *
  * A failed Profile refresh does not blank out an already-cached username — it's surfaced via
