@@ -1,5 +1,6 @@
 package de.mistatee.erglog.ui.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,10 +45,20 @@ fun MainScreen(
 
         is MainScreenUiState.Success -> {
             val results = viewModel.resultsFlow.collectAsLazyPagingItems()
+            val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+            // Stale (see CONTEXT.md) if either the Profile refresh or the Result History sync
+            // most recently failed — either one leaves some part of the screen showing cached data.
+            val isStale = current.syncError != null || results.loadState.refresh is LoadState.Error
             MainScreen(
                 username = current.username,
                 results = results,
                 modifier = modifier,
+                isStale = isStale,
+                isRefreshing = isRefreshing,
+                onRefresh = {
+                    viewModel.refresh()
+                    results.refresh()
+                },
             )
         }
 
@@ -56,28 +68,43 @@ fun MainScreen(
     }
 }
 
+@Suppress("LongParameterList") // Compose params with defaults; all but the first two are optional.
 @Composable
 internal fun MainScreen(
     username: String,
     results: LazyPagingItems<Result>,
     modifier: Modifier = Modifier,
+    isStale: Boolean = false,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        item(key = "profileheader") { ProfileHeader(username, modifier = Modifier.padding(24.dp)) }
-        item(key = "resulthistoryheader") { ResultHistoryHeader() }
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = modifier.fillMaxSize(),
+    ) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            item(key = "profileheader") { ProfileHeader(username, modifier = Modifier.padding(24.dp)) }
 
-        items(count = results.itemCount, key = results.itemKey { it.id }) { index ->
-            val result = results[index]
-            if (result != null) {
-                ResultHistoryItem(result)
-                if (index != results.itemCount - 1) {
-                    HorizontalDivider()
+            if (isStale) {
+                item(key = "stalebanner") { StaleDataBanner() }
+            }
+
+            item(key = "resulthistoryheader") { ResultHistoryHeader() }
+
+            items(count = results.itemCount, key = results.itemKey { it.id }) { index ->
+                val result = results[index]
+                if (result != null) {
+                    ResultHistoryItem(result)
+                    if (index != results.itemCount - 1) {
+                        HorizontalDivider()
+                    }
                 }
             }
-        }
 
-        item(key = "footer") {
-            ResultHistoryFooter(loadState = results.loadState, onRetry = results::retry)
+            item(key = "footer") {
+                ResultHistoryFooter(loadState = results.loadState, onRetry = results::retry)
+            }
         }
     }
 }
@@ -89,6 +116,30 @@ private fun ProfileHeader(username: String, modifier: Modifier = Modifier) {
         style = MaterialTheme.typography.headlineSmall,
         modifier = modifier
     )
+}
+
+/**
+ * Subtle, non-blocking hint that the currently shown data is Stale (see CONTEXT.md) — a background
+ * refresh failed, but the cached username and Result History are still worth showing underneath.
+ */
+@Composable
+private fun StaleDataBanner(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.small,
+            )
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Text(
+            text = "Showing saved data — couldn't refresh",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 @Composable

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.detekt)
 }
 
@@ -88,6 +89,13 @@ detekt {
     source.setFrom("src/main/kotlin", "src/main/java")
 }
 
+tasks.withType<Test> {
+    // Default forked test-worker heap is too small for this module's mockk/kotlin-reflect/Room
+    // usage combined and intermittently OOMs; the Gradle daemon's own -Xmx does not apply to it.
+    maxHeapSize = "3g"
+    jvmArgs("-XX:MaxMetaspaceSize=1g")
+}
+
 dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
@@ -116,6 +124,10 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.room.ktx)
+    implementation(libs.room.paging)
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
     implementation(libs.tink.android)
 
     // Debug builds
@@ -131,6 +143,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.mockk)
+    testImplementation(libs.room.testing)
 
     // Instrumented tests
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

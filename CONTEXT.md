@@ -50,4 +50,8 @@ _Avoid_: Workout History, Workout Log, Feed
 **Load Next Page**:
 The action of fetching the next page of a [Result History](#result-history) from `/api/users/{user}/results`, triggered when the Logbook Account holder scrolls to the last currently-loaded Result. Determined possible by comparing the API's `current_page` against `total_pages`, not by the presence of a `links.next` URL.
 _Avoid_: Load More, Infinite Scroll
+
+**Stale**:
+Describes [Result History](#result-history) or [Profile](#profile) shown from the Logbook Account holder's device after the most recent attempt to fetch fresh data from Concept2 failed (e.g. no network). The Logbook Account holder can still see their last-known data, but is informed it may not reflect changes made since.
+_Avoid_: Offline, Cached, Out of date
 </content>

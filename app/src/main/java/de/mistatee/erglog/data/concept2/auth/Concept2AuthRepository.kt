@@ -6,6 +6,7 @@ import de.mistatee.erglog.data.concept2.auth.model.Session
 import de.mistatee.erglog.data.concept2.auth.model.SessionError
 import de.mistatee.erglog.data.concept2.auth.model.TokenResponse
 import de.mistatee.erglog.data.concept2.auth.store.SessionStore
+import de.mistatee.erglog.data.local.LocalCache
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 
@@ -15,6 +16,7 @@ class Concept2AuthRepository(
     private val authApi: AuthApi,
     private val sessionStore: SessionStore,
     private val clock: Clock,
+    private val localCache: LocalCache,
 ) : AuthRepository {
     override val authorizationUrl: String
         get() = authApi.authorizationUrl
@@ -56,6 +58,9 @@ class Concept2AuthRepository(
 
     override suspend fun logout() {
         sessionStore.clearSession()
+        // Cached Result History/Profile are scoped to the Logbook Account that was signed in; see
+        // docs/adr/0005-room-for-offline-first-persistence.md.
+        localCache.clear()
     }
 
     private fun TokenResponse.toSession() =

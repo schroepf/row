@@ -11,6 +11,7 @@ import de.mistatee.erglog.data.concept2.auth.api.AuthApi
 import de.mistatee.erglog.data.concept2.auth.model.AuthException
 import de.mistatee.erglog.data.concept2.auth.model.SessionError
 import de.mistatee.erglog.data.concept2.auth.store.SessionStore
+import de.mistatee.erglog.data.local.LocalCache
 import io.mockk.Awaits
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -22,6 +23,8 @@ import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 
 class Concept2AuthRepositoryTest {
+    private val localCache = mockk<LocalCache>(relaxUnitFun = true)
+
     @Test
     fun `completeLogin saves session on success`() = runTest {
         // given
@@ -38,6 +41,7 @@ class Concept2AuthRepositoryTest {
             },
             sessionStore = sessionStore,
             clock = MockData.clock,
+            localCache = localCache,
         )
 
         // when
@@ -67,6 +71,7 @@ class Concept2AuthRepositoryTest {
             },
             sessionStore = sessionStore,
             clock = MockData.clock,
+            localCache = localCache,
         )
 
         // When
@@ -91,6 +96,7 @@ class Concept2AuthRepositoryTest {
             },
             sessionStore = sessionStore,
             clock = MockData.clock,
+            localCache = localCache,
         )
 
         // When
@@ -113,6 +119,7 @@ class Concept2AuthRepositoryTest {
                 coEvery { getSession() } returns session
             },
             clock = MockData.clock,
+            localCache = localCache,
         )
 
         // Then
@@ -130,6 +137,7 @@ class Concept2AuthRepositoryTest {
                 coEvery { getSession() } returns freshSession
             },
             clock = MockData.clock,
+            localCache = localCache,
         )
 
         // When
@@ -157,6 +165,7 @@ class Concept2AuthRepositoryTest {
             },
             sessionStore = sessionStore,
             clock = MockData.clock,
+            localCache = localCache,
         )
 
         // When
@@ -176,6 +185,7 @@ class Concept2AuthRepositoryTest {
                 coEvery { getSession() } returns null
             },
             clock = MockData.clock,
+            localCache = localCache,
         )
 
         // When
@@ -201,6 +211,7 @@ class Concept2AuthRepositoryTest {
                 coEvery { clearSession() } returns Unit
             },
             clock = MockData.clock,
+            localCache = localCache,
         )
 
         // When
@@ -211,5 +222,26 @@ class Concept2AuthRepositoryTest {
         val error = result.exceptionOrNull()
         assertThat(error).isNotNull().isInstanceOf<SessionError.RefreshFailed>()
         assertThat(error?.cause).isEqualTo(cause)
+    }
+
+    @Test
+    fun `logout clears the session and wipes the local cache`() = runTest {
+        // Given
+        val sessionStore = mockk<SessionStore> {
+            coEvery { clearSession() } just Runs
+        }
+        val repository = Concept2AuthRepository(
+            authApi = mockk(),
+            sessionStore = sessionStore,
+            clock = MockData.clock,
+            localCache = localCache,
+        )
+
+        // When
+        repository.logout()
+
+        // Then
+        coVerify(exactly = 1) { sessionStore.clearSession() }
+        coVerify(exactly = 1) { localCache.clear() }
     }
 }

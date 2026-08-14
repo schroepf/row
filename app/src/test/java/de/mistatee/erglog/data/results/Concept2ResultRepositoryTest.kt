@@ -1,95 +1,55 @@
 package de.mistatee.erglog.data.results
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadType
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.RemoteMediator
+import androidx.paging.testing.asSnapshot
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
-import assertk.assertions.isNotNull
-import assertk.assertions.isTrue
 import de.mistatee.erglog.common.MockData
-import de.mistatee.erglog.data.concept2.auth.model.SessionError
 import de.mistatee.erglog.data.concept2.logbook.results.Concept2ResultRepository
-import de.mistatee.erglog.data.concept2.logbook.results.api.ResultsApi
-import de.mistatee.erglog.data.concept2.logbook.results.model.ResultsApiException
-import io.mockk.coEvery
+import de.mistatee.erglog.data.local.results.ResultDao
+import de.mistatee.erglog.data.local.results.ResultEntity
+import de.mistatee.erglog.data.local.results.toEntity
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
+@OptIn(ExperimentalPagingApi::class)
 class Concept2ResultRepositoryTest {
-    @Test
-    fun `fetchPage returns results page on success`() =
-        runTest {
-            // given
-            val session = MockData.Auth.session
-            val page = 1
-            val pageSize = 20
-            val resultsPage = MockData.Api.Results.resultsPage
+    private class FakePagingSource(private val entities: List<ResultEntity>) : PagingSource<Int, ResultEntity>() {
+        override fun getRefreshKey(state: PagingState<Int, ResultEntity>): Int? = null
 
-            val repository = Concept2ResultRepository(
-                authRepository = mockk {
-                    coEvery { validSession() } returns Result.success(session)
-                },
-                resultsApi = mockk {
-                    coEvery {
-                        fetchResults(
-                            accessToken = session.accessToken,
-                            page = page,
-                            pageSize = pageSize,
-                        )
-                    } returns resultsPage
-                },
-            )
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ResultEntity> =
+            LoadResult.Page(data = entities, prevKey = null, nextKey = null)
+    }
 
-            // when
-            val result = repository.fetchPage(page = page, pageSize = pageSize)
-
-            // then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isEqualTo(resultsPage)
-        }
+    /** A no-op mediator: the cache is already "synced", so paging never needs to hit the network. */
+    @OptIn(ExperimentalPagingApi::class)
+    private class NoOpRemoteMediator : RemoteMediator<Int, ResultEntity>() {
+        override suspend fun load(loadType: LoadType, state: PagingState<Int, ResultEntity>): MediatorResult =
+            MediatorResult.Success(endOfPaginationReached = true)
+    }
 
     @Test
-    fun `fetchPage returns failure on missing session`() =
-        runTest {
-            // given
-            val repository = Concept2ResultRepository(
-                authRepository = mockk {
-                    coEvery { validSession() } returns Result.failure(SessionError.NoSession)
-                },
-                resultsApi = mockk(),
-            )
-
-            // when
-            val result = repository.fetchPage(page = 1, pageSize = 20)
-
-            // then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isNotNull().isInstanceOf<SessionError.NoSession>()
+    fun `observeResults emits Room-cached results mapped to the domain model`() = runTest {
+        // given
+        val cachedEntities = MockData.Api.Results.results.map { it.toEntity() }
+        val resultDao = mockk<ResultDao> {
+            every { pagingSource() } returns FakePagingSource(cachedEntities)
         }
+        val repository = Concept2ResultRepository(
+            resultDao = resultDao,
+            remoteMediator = NoOpRemoteMediator(),
+        )
 
-    @Test
-    fun `fetchPage returns failure when API throws`() =
-        runTest {
-            // give
-            val page = 1
-            val pageSize = 20
-            val session = MockData.Auth.session
-            val apiFailure = ResultsApiException("http_500", null)
+        // when
+        val results = repository.observeResults().asSnapshot()
 
-            val repository = Concept2ResultRepository(
-                authRepository = mockk {
-                    coEvery { validSession() } returns Result.success(session)
-                },
-                resultsApi = mockk<ResultsApi> {
-                    coEvery { fetchResults(session.accessToken, page = page, pageSize = pageSize) } throws apiFailure
-                },
-            )
-
-            // when
-            val result = repository.fetchPage(page = page, pageSize = pageSize)
-
-            // then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(apiFailure)
-        }
+        // then
+        assertThat(results).isEqualTo(MockData.Api.Results.results)
+    }
 }
